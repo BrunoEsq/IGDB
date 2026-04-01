@@ -128,6 +128,9 @@
         // Las API keys están protegidas en el servidor (Vercel Functions)
         // No se exponen datos sensibles en el cliente
         
+        // Placeholder SVG local (no necesita conexión a internet)
+        const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%23333%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3ESin Portada%3C/text%3E%3C/svg%3E';
+
         // --- ESTADO DE LA APLICACIÓN ---
         let myGames = JSON.parse(localStorage.getItem('mySavedGames')) || [];
         let selectedGameToSave = null;
@@ -158,21 +161,22 @@
                 const medals = ['text-yellow-400', 'text-gray-300', 'text-amber-600']; // Oro, Plata, Bronce
                 const medalColor = index < 3 ? medals[index] : 'text-blue-400';
 
-                container.innerHTML += `
-                    <div class="game-card bg-gray-800 rounded-xl overflow-hidden relative border border-gray-700">
-                        <div class="absolute top-3 left-3 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-full font-bold text-lg ${medalColor} z-10 border border-gray-600">
-                            #${index + 1}
-                        </div>
-                        <div class="absolute top-3 right-3 bg-yellow-500 text-gray-900 font-black px-3 py-1 rounded-lg z-10 shadow-lg">
-                            ${game.rating}
-                        </div>
-                        <img src="${game.image}" alt="${game.name}" class="w-full h-64 object-cover">
-                        <div class="p-5">
-                            <h3 class="font-bold text-xl mb-1 truncate">${game.name}</h3>
-                            <p class="text-sm text-gray-400">Completado</p>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'game-card bg-gray-800 rounded-xl overflow-hidden relative border border-gray-700';
+                card.innerHTML = `
+                    <div class="absolute top-3 left-3 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-full font-bold text-lg ${medalColor} z-10 border border-gray-600">
+                        #${index + 1}
+                    </div>
+                    <div class="absolute top-3 right-3 bg-yellow-500 text-gray-900 font-black px-3 py-1 rounded-lg z-10 shadow-lg">
+                        ${game.rating}
+                    </div>
+                    <img src="${game.image}" alt="${game.name}" class="w-full h-64 object-cover" onerror="this.src='${PLACEHOLDER_IMAGE}'">
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl mb-1 truncate">${game.name}</h3>
+                        <p class="text-sm text-gray-400">Completado</p>
                     </div>
                 `;
+                container.appendChild(card);
             });
         }
 
@@ -188,18 +192,26 @@
 
             // Mostrar todos los juegos ordenados por los añadidos más recientemente
             [...myGames].reverse().forEach(game => {
-                container.innerHTML += `
-                    <div class="game-card bg-gray-800 rounded-lg overflow-hidden relative border border-gray-700 flex flex-col">
-                        <div class="absolute top-2 right-2 bg-yellow-500 text-gray-900 font-black px-2 py-1 text-sm rounded z-10">
-                            ${game.rating}
-                        </div>
-                        <img src="${game.image}" alt="${game.name}" class="w-full h-48 object-cover">
-                        <div class="p-4 flex-grow flex flex-col justify-between">
-                            <h3 class="font-bold text-md mb-2 line-clamp-2">${game.name}</h3>
-                            <button onclick="deleteGame('${game.id}')" class="text-red-400 hover:text-red-300 text-sm text-left mt-2 transition"><i class="fas fa-trash mr-1"></i> Eliminar</button>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'game-card bg-gray-800 rounded-lg overflow-hidden relative border border-gray-700 flex flex-col';
+                card.innerHTML = `
+                    <div class="absolute top-2 right-2 bg-yellow-500 text-gray-900 font-black px-2 py-1 text-sm rounded z-10">
+                        ${game.rating}
+                    </div>
+                    <img src="${game.image}" alt="${game.name}" class="w-full h-48 object-cover" onerror="this.src='${PLACEHOLDER_IMAGE}'">
+                    <div class="p-4 flex-grow flex flex-col justify-between">
+                        <h3 class="font-bold text-md mb-2 line-clamp-2">${game.name}</h3>
+                        <button class="delete-btn text-red-400 hover:text-red-300 text-sm text-left mt-2 transition">
+                            <i class="fas fa-trash mr-1"></i> Eliminar
+                        </button>
                     </div>
                 `;
+                
+                // Event listener para eliminar
+                const deleteBtn = card.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', () => deleteGame(game.id));
+                
+                container.appendChild(card);
             });
         }
 
@@ -241,23 +253,24 @@
 
                 data.forEach(game => {
                     // Las URLs ya vienen procesadas del servidor
-                    let imageUrl = 'https://via.placeholder.com/150?text=Sin+Portada';
+                    let imageUrl = PLACEHOLDER_IMAGE;
                     if (game.cover && game.cover.url) {
                         imageUrl = 'https:' + game.cover.url.replace('t_thumb', 't_cover_big');
                     }
 
-                    const safeName = game.name.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                    const result = document.createElement('div');
+                    result.className = 'flex items-center gap-4 p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg cursor-pointer transition border border-transparent hover:border-blue-500';
+                    result.innerHTML = `
+                        <img src="${imageUrl}" class="w-16 h-20 object-cover rounded shadow" onerror="this.src='${PLACEHOLDER_IMAGE}'">
+                        <div>
+                            <h4 class="font-bold text-lg">${game.name}</h4>
+                        </div>
+                        <i class="fas fa-chevron-right ml-auto text-gray-500"></i>
+                    `;
 
-                    resultsContainer.innerHTML += `
-                <div onclick="selectGame('${game.id}', '${safeName}', '${imageUrl}')" 
-                     class="flex items-center gap-4 p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg cursor-pointer transition border border-transparent hover:border-blue-500">
-                    <img src="${imageUrl}" class="w-16 h-20 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/150?text=Sin+Portada'">
-                    <div>
-                        <h4 class="font-bold text-lg">${game.name}</h4>
-                    </div>
-                    <i class="fas fa-chevron-right ml-auto text-gray-500"></i>
-                </div>
-            `;
+                    // Event listener para seleccionar
+                    result.addEventListener('click', () => selectGame(game.id, game.name, imageUrl));
+                    resultsContainer.appendChild(result);
                 });
             } catch (error) {
                 loading.classList.add('hidden');
@@ -274,7 +287,7 @@
             const selectedNameDisplay = document.getElementById('selected-game-name');
             const resultsContainer = document.getElementById('search-results');
 
-            selectedNameDisplay.innerHTML = `<img src="${image}" class="w-10 h-10 object-cover rounded-full border border-gray-600"> Valorando: ${name}`;
+            selectedNameDisplay.innerHTML = `<img src="${image}" class="w-10 h-10 object-cover rounded-full border border-gray-600" onerror="this.src='${PLACEHOLDER_IMAGE}'"> Valorando: ${name}`;
             resultsContainer.innerHTML = ''; // Limpiar resultados
             document.getElementById('search-input').value = ''; // Limpiar input
 
