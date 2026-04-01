@@ -4,14 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Colección de Juegos - GameTracker</title>
+    <title>JLM - GameTracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
         * {
-            scrollbar-color: #D4A574 #1a1410;
-            scrollbar-width: thin;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -22,7 +29,7 @@
             overflow-x: hidden;
         }
 
-        /* Fondo decorativo con patrón sutil */
+        /* Fondo decorativo con textura profesional */
         body::before {
             content: '';
             position: fixed;
@@ -31,78 +38,168 @@
             width: 100%;
             height: 100%;
             background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(212, 165, 116, 0.03) 2px, rgba(212, 165, 116, 0.03) 4px);
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(212, 165, 116, 0.02) 2px, rgba(212, 165, 116, 0.02) 4px),
+                repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
             pointer-events: none;
             z-index: -1;
         }
 
-        /* Barra de navegación estilo Zelda */
+        /* Barra de navegación minimalista */
         .zelda-nav {
-            background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
-            border-bottom: 3px solid #D4A574;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(212, 165, 116, 0.2);
-            position: relative;
-        }
-
-        .zelda-nav::before {
-            content: '';
-            position: absolute;
+            background: linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+            position: fixed;
+            width: 100%;
+            z-index: 50;
             top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #D4A574, transparent);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
         }
 
-        /* Logo con efecto Triforce */
+        /* Navbar en modo scrolled (cuando scrollea) */
+        .zelda-nav.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Logo */
         .zelda-logo {
             font-family: 'Cinzel', serif;
             font-weight: 900;
-            font-size: 1.75rem;
-            background: linear-gradient(135deg, #D4A574, #E8D4A2, #D4A574);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 20px rgba(212, 165, 116, 0.5);
-            letter-spacing: 2px;
+            font-size: 1.5rem;
+            color: #d4a574;
+            letter-spacing: 1px;
+            margin: 0;
+            transition: color 0.4s ease;
         }
 
-        /* Botones de navegación */
-        .nav-btn {
+        .zelda-nav.scrolled .zelda-logo {
+            color: #1a1a1a;
+        }
+
+        /* Botón hamburguesa */
+        .hamburger-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d4a574;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0;
+        }
+
+        .zelda-nav.scrolled .hamburger-btn {
+            color: #1a1a1a;
+        }
+
+        .hamburger-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 2px;
+            background: #d4a574;
+            transition: all 0.4s ease;
+        }
+
+        .zelda-nav.scrolled .hamburger-line {
+            background: #1a1a1a;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translateY(10px);
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translateY(-10px);
+        }
+
+        /* Menú desplegable */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-sidebar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            z-index: 41;
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+            padding: 120px 3rem 3rem;
+            overflow-y: auto;
+        }
+
+        .menu-sidebar.active {
+            transform: translateX(0);
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .menu-item {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        .menu-item a {
+            text-decoration: none;
+            color: #fff;
             font-family: 'Cinzel', serif;
-            color: #c9a85a;
-            transition: all 0.3s ease;
-            position: relative;
-            padding: 0.75rem 1.5rem;
-            border: 1px solid transparent;
-            border-radius: 2px;
-        }
-
-        .nav-btn:hover {
-            color: #D4A574;
-            background: rgba(212, 165, 116, 0.15);
-            border: 1px solid #D4A574;
-            box-shadow: 0 0 15px rgba(212, 165, 116, 0.4), inset 0 0 15px rgba(212, 165, 116, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn-primary {
-            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-            color: #F5DEB3;
-            border: 2px solid #D4A574;
-            border-radius: 4px;
+            font-size: 1.8rem;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .nav-btn-primary:hover {
-            background: linear-gradient(135deg, #A0522D 0%, #CD853F 100%);
-            box-shadow: 0 6px 20px rgba(212, 165, 116, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-            color: #FFFACD;
+        .menu-item:hover a {
+            color: #00d4ff;
+            transform: translateX(10px);
         }
 
-        /* Secciones con tema medieval */
+        .menu-number {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            min-width: 30px;
+        }
+
+        /* Secciones */
         .section-content {
             display: none;
             animation: fadeIn 0.6s ease-in-out;
@@ -123,29 +220,295 @@
             }
         }
 
-        /* Títulos de sección */
-        .section-title {
+        /* HOME SECTION - HERO */
+        .hero-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%);
+            z-index: 1;
+        }
+
+        /* Fondo con texto gigante "JLM" */
+        .hero-background-text {
+            position: absolute;
             font-family: 'Cinzel', serif;
-            font-size: 2.5rem;
+            font-size: clamp(15vw, 20vw, 500px);
             font-weight: 900;
-            background: linear-gradient(135deg, #D4A574, #F5DEB3, #D4A574);
+            letter-spacing: 20px;
+            color: rgba(212, 165, 116, 0.05);
+            white-space: nowrap;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateZ(-15deg);
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Contenedor del Cubo 3D Premium */
+        .cube-container {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            margin: 0 auto;
+            perspective: 1200px;
+            z-index: 10;
+            filter: drop-shadow(0 0 60px rgba(212, 165, 116, 0.3));
+            will-change: transform;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+
+        /* Caras del cubo con gradientes premium */
+        .cube-face {
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 5rem;
+            font-weight: 900;
+            color: transparent;
+            backface-visibility: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            border: 2px solid rgba(212, 165, 116, 0.5);
+            backdrop-filter: blur(10px);
+            will-change: transform;
+        }
+
+        /* Gradientes modernos para cada cara */
+        .cube-face-front {
+            transform: translateZ(175px);
+            background: linear-gradient(135deg, 
+                rgba(212, 165, 116, 0.15) 0%,
+                rgba(100, 80, 60, 0.25) 50%,
+                rgba(212, 165, 116, 0.1) 100%);
+            box-shadow: 
+                inset 0 0 40px rgba(212, 165, 116, 0.2),
+                0 0 30px rgba(212, 165, 116, 0.15),
+                inset -10px -10px 30px rgba(0, 0, 0, 0.3),
+                inset 10px 10px 30px rgba(212, 165, 116, 0.1);
+        }
+
+        .cube-face-front::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 0 30px rgba(212, 165, 116, 0.3);
+            text-shadow: 0 0 40px rgba(212, 165, 116, 0.5);
+            filter: drop-shadow(0 0 20px rgba(212, 165, 116, 0.4));
         }
 
-        .section-subtitle {
-            color: #c9a85a;
-            font-size: 1.1rem;
+        .cube-face-back {
+            transform: rotateY(180deg) translateZ(175px);
+            background: linear-gradient(135deg,
+                rgba(80, 60, 40, 0.2) 0%,
+                rgba(212, 165, 116, 0.1) 50%,
+                rgba(80, 60, 40, 0.2) 100%);
+            box-shadow:
+                inset 0 0 40px rgba(100, 80, 60, 0.15),
+                0 0 25px rgba(212, 165, 116, 0.1),
+                inset -10px -10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .cube-face-back::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.7;
+        }
+
+        .cube-face-right {
+            transform: rotateY(90deg) translateZ(175px);
+            background: linear-gradient(90deg,
+                rgba(212, 165, 116, 0.12) 0%,
+                rgba(100, 80, 60, 0.2) 50%,
+                rgba(212, 165, 116, 0.12) 100%);
+            box-shadow:
+                inset 0 0 35px rgba(212, 165, 116, 0.15),
+                inset -20px 0px 40px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(212, 165, 116, 0.12);
+        }
+
+        .cube-face-right::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.8;
+        }
+
+        .cube-face-left {
+            transform: rotateY(-90deg) translateZ(175px);
+            background: linear-gradient(90deg,
+                rgba(100, 80, 60, 0.2) 0%,
+                rgba(212, 165, 116, 0.12) 50%,
+                rgba(100, 80, 60, 0.2) 100%);
+            box-shadow:
+                inset 0 0 35px rgba(100, 80, 60, 0.15),
+                inset 20px 0px 40px rgba(0, 0, 0, 0.2),
+                0 0 25px rgba(212, 165, 116, 0.1);
+        }
+
+        .cube-face-left::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.8;
+        }
+
+        .cube-face-top {
+            transform: rotateX(90deg) translateZ(175px);
+            background: linear-gradient(180deg,
+                rgba(212, 165, 116, 0.25) 0%,
+                rgba(212, 165, 116, 0.1) 100%);
+            box-shadow:
+                inset 0 -20px 40px rgba(0, 0, 0, 0.2),
+                0 0 40px rgba(212, 165, 116, 0.2),
+                inset 0 0 30px rgba(212, 165, 116, 0.1);
+        }
+
+        .cube-face-top::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #D4A574 0%, #F5DEB3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cube-face-bottom {
+            transform: rotateX(-90deg) translateZ(175px);
+            background: linear-gradient(180deg,
+                rgba(80, 60, 40, 0.15) 0%,
+                rgba(0, 0, 0, 0.1) 100%);
+            box-shadow:
+                inset 0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 35px rgba(212, 165, 116, 0.1);
+        }
+
+        .cube-face-bottom::before {
+            content: 'JLM';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #8B7355 0%, #5C4033 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.6;
+        }
+
+        /* Luz ambiente alrededor del cubo */
+        .cube-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 450px;
+            height: 450px;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(212, 165, 116, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            filter: blur(40px);
+        }
+
+        /* Texto animado que aparece con scroll */
+        .scroll-text-section {
+            position: relative;
+            z-index: 5;
+            min-height: 400vh;
+            padding: 200px 4% 100px 4%;
+            background: linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%);
+            color: #e8d4a2;
+        }
+
+        .sticky-section {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scroll-text-container {
+            text-align: center;
+            opacity: 0;
+        }
+
+        .scroll-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #d4a574;
+            line-height: 1.2;
+            max-width: 800px;
+            letter-spacing: 2px;
+        }
+
+        .scroll-subtitle {
+            font-size: 1.3rem;
+            color: #666;
+            margin-top: 1.5rem;
             font-style: italic;
-            margin-bottom: 2rem;
+            max-width: 600px;
         }
 
-        /* Decoración de línea */
+        /* Secciones de contenido */
         .decoration-line {
             height: 3px;
             background: linear-gradient(90deg, transparent, #D4A574, transparent);
@@ -153,7 +516,27 @@
             border-radius: 2px;
         }
 
-        /* Tarjetas de juegos - Estilo Zelda */
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #1a1a1a, #333, #1a1a1a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+
+        /* Tarjetas de juegos */
         .game-card {
             position: relative;
             border: 2px solid #D4A574;
@@ -197,7 +580,6 @@
             filter: brightness(1.1) contrast(1.1);
         }
 
-        /* Rating badge */
         .rating-badge {
             position: absolute;
             top: 12px;
@@ -214,7 +596,6 @@
             z-index: 20;
         }
 
-        /* Medal badges */
         .medal-badge {
             position: absolute;
             top: 12px;
@@ -251,7 +632,6 @@
             border-color: #CD7F32;
         }
 
-        /* Game info container */
         .game-info {
             padding: 1.25rem;
             background: linear-gradient(180deg, rgba(42, 24, 16, 0.9), rgba(26, 15, 8, 0.95));
@@ -274,17 +654,17 @@
 
         /* Formulario de búsqueda */
         .search-box {
-            background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
-            border: 2px solid #D4A574;
+            background: #fff;
+            border: 2px solid #ddd;
             border-radius: 4px;
             padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(212, 165, 116, 0.05);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .search-input {
-            background: rgba(212, 165, 116, 0.05);
-            border: 2px solid #D4A574;
-            color: #E8D4A2;
+            background: #fff;
+            border: 2px solid #ddd;
+            color: #333;
             padding: 0.75rem 1rem;
             border-radius: 4px;
             font-family: 'Crimson Text', serif;
@@ -293,56 +673,55 @@
         }
 
         .search-input::placeholder {
-            color: #8B6F47;
+            color: #999;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #F5DEB3;
-            background: rgba(212, 165, 116, 0.1);
-            box-shadow: 0 0 20px rgba(212, 165, 116, 0.4);
+            border-color: #1a1a1a;
+            background: #fafafa;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .search-btn {
-            background: linear-gradient(135deg, #8B4513 0%, #CD853F 100%);
-            color: #FFFACD;
-            border: 2px solid #D4A574;
+            background: #1a1a1a;
+            color: #fff;
+            border: 2px solid #1a1a1a;
             padding: 0.75rem 1.5rem;
             border-radius: 4px;
             font-weight: 600;
             font-family: 'Cinzel', serif;
             transition: all 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .search-btn:hover {
-            background: linear-gradient(135deg, #CD853F 0%, #DAA520 100%);
-            box-shadow: 0 6px 20px rgba(212, 165, 116, 0.6);
-            transform: translateY(-2px);
+            background: #fff;
+            color: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        /* Rating form */
         .rating-form {
-            background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
-            border: 2px solid #D4A574;
+            background: #fff;
+            border: 2px solid #ddd;
             border-radius: 4px;
             padding: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(212, 165, 116, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .rating-form-title {
             font-family: 'Cinzel', serif;
-            color: #F5DEB3;
+            color: #1a1a1a;
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 1rem;
         }
 
         .rating-input {
-            background: rgba(212, 165, 116, 0.05);
-            border: 2px solid #D4A574;
-            color: #FFD700;
+            background: #fff;
+            border: 2px solid #ddd;
+            color: #1a1a1a;
             padding: 0.75rem 1rem;
             border-radius: 4px;
             font-family: 'Cinzel', serif;
@@ -353,14 +732,13 @@
 
         .rating-input:focus {
             outline: none;
-            border-color: #FFD700;
-            background: rgba(212, 165, 116, 0.1);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            border-color: #1a1a1a;
+            background: #fafafa;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* Loading animation */
         .loading {
-            color: #D4A574;
+            color: #1a1a1a;
             text-align: center;
             font-size: 1.2rem;
             padding: 2rem;
@@ -375,10 +753,9 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Search results */
         .search-result {
-            background: linear-gradient(135deg, rgba(42, 24, 16, 0.9), rgba(26, 15, 8, 0.95));
-            border: 1px solid #D4A574;
+            background: #fff;
+            border: 1px solid #ddd;
             border-radius: 4px;
             padding: 1rem;
             transition: all 0.3s ease;
@@ -389,9 +766,9 @@
         }
 
         .search-result:hover {
-            background: linear-gradient(135deg, rgba(52, 34, 26, 0.95), rgba(42, 25, 15, 1));
-            border-color: #F5DEB3;
-            box-shadow: 0 0 20px rgba(212, 165, 116, 0.4);
+            background: #fafafa;
+            border-color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             transform: translateX(5px);
         }
 
@@ -399,21 +776,20 @@
             width: 60px;
             height: 80px;
             object-fit: cover;
-            border: 2px solid #D4A574;
+            border: 2px solid #ddd;
             border-radius: 3px;
         }
 
         .search-result-title {
             font-family: 'Cinzel', serif;
-            color: #E8D4A2;
+            color: #1a1a1a;
             font-weight: 600;
         }
 
-        /* Delete button */
         .delete-btn {
-            background: linear-gradient(135deg, #8B0000, #DC143C);
-            color: #FFB6C1;
-            border: 1px solid #FF69B4;
+            background: #dc3545;
+            color: #fff;
+            border: 1px solid #dc3545;
             padding: 0.5rem 1rem;
             border-radius: 3px;
             cursor: pointer;
@@ -425,43 +801,40 @@
         }
 
         .delete-btn:hover {
-            background: linear-gradient(135deg, #DC143C, #FF1493);
-            box-shadow: 0 0 15px rgba(220, 20, 60, 0.6);
+            background: #c82333;
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
             transform: translateX(-3px);
         }
 
-        /* Save button */
         .save-btn {
-            background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
-            color: #FFFACD;
-            border: 2px solid #90EE90;
+            background: #28a745;
+            color: #fff;
+            border: 2px solid #28a745;
             padding: 0.75rem 1.5rem;
             border-radius: 4px;
             font-weight: 700;
             font-family: 'Cinzel', serif;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .save-btn:hover {
-            background: linear-gradient(135deg, #32CD32 0%, #3CB371 100%);
-            box-shadow: 0 6px 20px rgba(50, 205, 50, 0.6);
+            background: #218838;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
             transform: translateY(-2px);
         }
 
-        /* Error messages */
         .error-message {
-            color: #FF6B6B;
-            background: rgba(255, 107, 107, 0.1);
-            border: 1px solid #FF6B6B;
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
             padding: 1rem;
             border-radius: 4px;
             text-align: center;
             font-weight: 600;
         }
 
-        /* Empty state */
         .empty-state {
             color: #a89060;
             text-align: center;
@@ -469,59 +842,146 @@
             font-style: italic;
             font-size: 1.1rem;
         }
+
+        /* SECCIÓN: TOP 3 JUEGOS */
+        #top-games {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* SECCIÓN: CATÁLOGO */
+        #catalog {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        /* SECCIÓN: AÑADIR JUEGO */
+        #add {
+            background: #f5f5f5;
+            color: #333;
+        }
     </style>
 </head>
 
 <body class="min-h-screen pb-10">
 
     <!-- Navegación -->
-    <nav class="zelda-nav fixed w-full z-50 top-0">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="zleda-logo flex items-center gap-2">
-                <i class="fas fa-crown text-3xl" style="color: #D4A574;"></i>
-                <span class="zelda-logo">GAME TRACKER</span>
-            </div>
-            <div class="flex space-x-4">
-                <button onclick="showSection('home')" class="nav-btn">
-                    <i class="fas fa-home mr-1"></i>Inicio
-                </button>
-                <button onclick="showSection('catalog')" class="nav-btn">
-                    <i class="fas fa-book mr-1"></i>Catálogo
-                </button>
-                <button onclick="showSection('add')" class="nav-btn-primary">
-                    <i class="fas fa-plus mr-1"></i>Añadir Juego
-                </button>
-            </div>
-        </div>
+    <nav class="zelda-nav">
+        <h1 class="zelda-logo">JLM</h1>
+        <button class="hamburger-btn" id="hamburger-btn">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 mt-32">
+    <!-- Menú desplegable -->
+    <div class="menu-overlay" id="menu-overlay"></div>
+    <div class="menu-sidebar" id="menu-sidebar">
+        <ul class="menu-list" id="menu-list">
+            <li class="menu-item">
+                <a href="#" onclick="showSection('home'); closeMenu()">
+                    <span class="menu-number">01</span>
+                    <span>Inicio</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" onclick="showSection('top-games'); closeMenu()">
+                    <span class="menu-number">02</span>
+                    <span>Top 3</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" onclick="showSection('catalog'); closeMenu()">
+                    <span class="menu-number">03</span>
+                    <span>Catálogo</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="#" onclick="showSection('add'); closeMenu()">
+                    <span class="menu-number">04</span>
+                    <span>Añadir Juego</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 
-        <!-- SECCIÓN: HOME (TOP 3) -->
+    <main>
+
+        <!-- SECCIÓN: HOME - HERO CON CUBO 3D Y SCROLL ANIMATIONS -->
         <section id="home" class="section-content active">
-            <div class="mb-8">
+            <div class="hero-container">
+                <div class="hero-background-text">JLM.</div>
+                
+                <div class="cube-container">
+                    <div class="cube" id="rotating-cube">
+                        <div class="cube-face cube-face-front">JLM</div>
+                        <div class="cube-face cube-face-back">JLM</div>
+                        <div class="cube-face cube-face-right">JLM</div>
+                        <div class="cube-face cube-face-left">JLM</div>
+                        <div class="cube-face cube-face-top">JLM</div>
+                        <div class="cube-face cube-face-bottom">JLM</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texto animado con scroll -->
+            <div class="scroll-text-section">
+                <div class="sticky-section">
+                    <div class="scroll-text-container" id="scroll-text-1">
+                        <h2 class="scroll-title">Mi Legado de Juegos</h2>
+                        <p class="scroll-subtitle">Cada título es una aventura completada</p>
+                    </div>
+                </div>
+
+                <div class="sticky-section">
+                    <div class="scroll-text-container" id="scroll-text-2">
+                        <h2 class="scroll-title">Los Mejores Mundos</h2>
+                        <p class="scroll-subtitle">Explorando historias épicas</p>
+                    </div>
+                </div>
+
+                <div class="sticky-section">
+                    <div class="scroll-text-container" id="scroll-text-3">
+                        <h2 class="scroll-title">Descubre Mi Catálogo</h2>
+                        <p class="scroll-subtitle">Todos mis juegos en un solo lugar</p>
+                    </div>
+                </div>
+
+                <div class="sticky-section">
+                    <div class="scroll-text-container" id="scroll-text-4">
+                        <h2 class="scroll-title">¿Listo para Explorar?</h2>
+                        <p class="scroll-subtitle">Navega hacia tus próximas aventuras</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: TOP 3 JUEGOS -->
+        <section id="top-games" class="section-content max-w-7xl mx-auto px-4">
+            <div class="mt-32 mb-8">
                 <h1 class="section-title">⚔️ Mi Top 3 Histórico</h1>
                 <p class="section-subtitle">Los legendarios juegos que he completado...</p>
                 <div class="decoration-line"></div>
             </div>
-            <div id="top-games-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div id="top-games-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
             </div>
         </section>
 
         <!-- SECCIÓN: CATÁLOGO -->
-        <section id="catalog" class="section-content">
-            <div class="mb-8">
+        <section id="catalog" class="section-content max-w-7xl mx-auto px-4">
+            <div class="mt-32 mb-8">
                 <h1 class="section-title">📖 Mi Gran Catálogo</h1>
                 <p class="section-subtitle">Todos los juegos que he conquistado...</p>
                 <div class="decoration-line"></div>
             </div>
-            <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-20">
             </div>
         </section>
 
         <!-- SECCIÓN: AÑADIR JUEGO -->
-        <section id="add" class="section-content max-w-3xl mx-auto">
-            <div class="mb-8 text-center">
+        <section id="add" class="section-content max-w-3xl mx-auto px-4">
+            <div class="mt-32 mb-8 text-center">
                 <h1 class="section-title">🔍 Buscar Nuevo Juego</h1>
                 <p class="section-subtitle">Descubre y registra tu próxima aventura...</p>
                 <div class="decoration-line"></div>
@@ -565,20 +1025,217 @@
     </main>
 
     <script>
-        // Placeholder SVG local
+        // Registrar ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ===== FUNCIONES PARA EL MENÚ =====
+        let menuOpen = false;
+
+        function toggleMenu() {
+            const hamburger = document.getElementById('hamburger-btn');
+            const menuSidebar = document.getElementById('menu-sidebar');
+            const menuOverlay = document.getElementById('menu-overlay');
+
+            menuOpen = !menuOpen;
+            hamburger.classList.toggle('active');
+            menuSidebar.classList.toggle('active');
+            menuOverlay.classList.toggle('active');
+
+            if (menuOpen) {
+                animateMenuItems();
+            }
+        }
+
+        function closeMenu() {
+            const hamburger = document.getElementById('hamburger-btn');
+            const menuSidebar = document.getElementById('menu-sidebar');
+            const menuOverlay = document.getElementById('menu-overlay');
+
+            menuOpen = false;
+            hamburger.classList.remove('active');
+            menuSidebar.classList.remove('active');
+            menuOverlay.classList.remove('active');
+        }
+
+        function animateMenuItems() {
+            const items = document.querySelectorAll('.menu-item');
+            const tl = gsap.timeline();
+
+            items.forEach((item, index) => {
+                tl.to(item, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.5,
+                    ease: 'power2.out'
+                }, index * 0.1);
+            });
+        }
+
+        // Event listeners para el menú
+        document.getElementById('hamburger-btn').addEventListener('click', toggleMenu);
+        document.getElementById('menu-overlay').addEventListener('click', closeMenu);
+
+        // ===== ANIMACIÓN DINÁMICA DEL NAVBAR CON SCROLL =====
+        function initNavbarAnimation() {
+            const navbar = document.querySelector('.zelda-nav');
+            let isScrolled = false;
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0 && !isScrolled) {
+                    // Cambiar a blanco
+                    isScrolled = true;
+                    gsap.to(navbar, {
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        duration: 0.4,
+                        ease: 'power2.inOut'
+                    });
+                } else if (window.scrollY === 0 && isScrolled) {
+                    // Volver al color original
+                    isScrolled = false;
+                    gsap.to(navbar, {
+                        background: 'linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%)',
+                        duration: 0.4,
+                        ease: 'power2.inOut'
+                    });
+                }
+            }, { passive: true });
+        }
+
+        // ===== ANIMACIONES DE SCROLL =====
+        function initScrollAnimations() {
+            const texts = ['#scroll-text-1', '#scroll-text-2', '#scroll-text-3', '#scroll-text-4'];
+            
+            texts.forEach((selector) => {
+                gsap.to(selector, {
+                    scrollTrigger: {
+                        trigger: selector,
+                        start: 'top 80%',
+                        end: 'bottom 20%',
+                        scrub: 1,
+                        markers: false
+                    },
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: 'power2.out'
+                });
+
+                // Animar el texto más arriba con parallax sutil
+                gsap.to(selector + ' .scroll-title', {
+                    scrollTrigger: {
+                        trigger: selector,
+                        start: 'top 80%',
+                        end: 'top 20%',
+                        scrub: 0.5
+                    },
+                    y: -50,
+                    ease: 'none'
+                });
+            });
+        }
         const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%232a1810%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23D4A574%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Cinzel%22%3ESin Portada%3C/text%3E%3C/svg%3E';
 
         let myGames = JSON.parse(localStorage.getItem('mySavedGames')) || [];
         let selectedGameToSave = null;
 
+        // ===== ANIMACIONES GSAP =====
+        function initHeroAnimations() {
+            const cube = document.getElementById('rotating-cube');
+            if (!cube) return;
+
+            // Variables de seguimiento del ratón
+            let targetRotationX = 0;
+            let targetRotationY = 0;
+            let currentRotationX = 0;
+            let currentRotationY = 0;
+            const smoothSpeed = 0.08; // Delay suave (velocidad de interpolación)
+
+            // Animación base orgánica del cubo
+            const baseAnimation = gsap.timeline({ repeat: -1 });
+            
+            baseAnimation
+                .to(cube, {
+                    rotationX: 20,
+                    rotationY: 35,
+                    duration: 5,
+                    ease: 'sine.inOut'
+                }, 0)
+                .to(cube, {
+                    rotationX: -15,
+                    rotationY: 75,
+                    duration: 7,
+                    ease: 'sine.inOut'
+                }, 2.5)
+                .to(cube, {
+                    rotationX: 35,
+                    rotationY: -50,
+                    duration: 6,
+                    ease: 'sine.inOut'
+                }, 5)
+                .to(cube, {
+                    rotationX: 0,
+                    rotationY: 0,
+                    duration: 8,
+                    ease: 'sine.inOut'
+                }, 8);
+
+            // Seguimiento del ratón con delay suave (estilo Apple)
+            document.addEventListener('mousemove', (e) => {
+                const cubeRect = cube.getBoundingClientRect();
+                const centerX = cubeRect.left + cubeRect.width / 2;
+                const centerY = cubeRect.top + cubeRect.height / 2;
+
+                // Calcular ángulos objetivo basado en la posición del ratón
+                const distX = e.clientX - centerX;
+                const distY = e.clientY - centerY;
+                
+                // Rango de rotación: ±25 grados
+                targetRotationX = (distY / (window.innerHeight / 2)) * 25;
+                targetRotationY = -(distX / (window.innerWidth / 2)) * 25;
+                targetRotationX = Math.max(-25, Math.min(25, targetRotationX));
+                targetRotationY = Math.max(-25, Math.min(25, targetRotationY));
+            });
+
+            // Animación suave de interpolación del cubo
+            gsap.ticker.add(() => {
+                currentRotationX += (targetRotationX - currentRotationX) * smoothSpeed;
+                currentRotationY += (targetRotationY - currentRotationY) * smoothSpeed;
+                
+                // Aplicar la rotación interpolada
+                gsap.set(cube, {
+                    rotationX: currentRotationX,
+                    rotationY: currentRotationY
+                });
+            });
+        }
+
         function showSection(sectionId) {
             document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            if (sectionId === 'home') renderHome();
+            
+            if (sectionId === 'home') {
+                initHeroAnimations();
+                initScrollAnimations();
+                renderHome();
+            }
+            if (sectionId === 'top-games') renderTopGames();
             if (sectionId === 'catalog') renderCatalog();
+            
+            closeMenu();
+            window.scrollTo(0, 0);
+            
+            // Reinicializar animaciones de scroll
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+                initNavbarAnimation();
+            }, 100);
         }
 
         function renderHome() {
+            // Home solo tiene el hero con animaciones
+        }
+
+        function renderTopGames() {
             const container = document.getElementById('top-games-container');
             container.innerHTML = '';
 
@@ -656,7 +1313,7 @@
             loading.classList.remove('hidden');
 
             try {
-                const response = await fetch('/api/searchGames', {
+                const response = await fetch('/api/search-games', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query })
@@ -750,7 +1407,18 @@
             }
         }
 
-        renderHome();
+        // Iniciar animaciones al cargar la página
+        window.addEventListener('load', () => {
+            initHeroAnimations();
+            initScrollAnimations();
+            renderHome();
+            initNavbarAnimation();
+        });
+
+        // Refrescar ScrollTrigger cuando se redimensiona la ventana
+        window.addEventListener('resize', () => {
+            ScrollTrigger.refresh();
+        });
     </script>
 </body>
 

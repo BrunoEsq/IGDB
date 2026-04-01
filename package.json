@@ -4,7 +4,8 @@
   "description": "Mi colección de juegos completados con seguridad",
   "private": true,
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "node server.js",
+    "vercel": "vercel dev",
     "build": "echo 'Build complete'",
     "start": "node server.js"
   },
