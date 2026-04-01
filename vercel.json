@@ -11,10 +11,6 @@
     "IGDB_ACCESS_TOKEN": {
       "description": "Access Token from IGDB API",
       "required": true
-    },
-    "CORS_ALLOWED_ORIGINS": {
-      "description": "Comma-separated list of allowed origins",
-      "value": "https://yourdomain.com"
     }
   },
   "functions": {

@@ -48,10 +48,9 @@ Abre `.env.local` y completa:
 # Ve a https://api.igdb.com/ para obtener estas credenciales
 IGDB_CLIENT_ID=tu_client_id
 IGDB_ACCESS_TOKEN=tu_access_token
-
-# Dominios permitidos (localhost para desarrollo)
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 ```
+
+Las credenciales solo se usan en el servidor. El proxy es público y seguro.
 
 ### 3. Ejecutar en desarrollo
 
@@ -101,8 +100,9 @@ En el dashboard de Vercel, ve a **Settings → Environment Variables** y añade:
 ```
 IGDB_CLIENT_ID=tu_client_id
 IGDB_ACCESS_TOKEN=tu_access_token
-CORS_ALLOWED_ORIGINS=https://tudominio.vercel.app
 ```
+
+El proxy es público - cualquiera puede hacer peticiones, pero solo tu servidor conoce las credenciales IGDB.
 
 ### 4. Deploy
 
@@ -143,16 +143,13 @@ Las API keys **nunca se exponen** al navegador.
 | **Headers HTTP** | X-Content-Type-Options, X-Frame-Options |
 | **Cache** | 5 minutos para reducir carga en IGDB |
 | **Rate Limiting** | Compatible con límites de IGDB (50 req/seg) |
+| **Proxy Público** | Cualquiera puede usar, pero secretos están en servidor |
 
 ## 🐛 Troubleshooting
 
 ### "Error: Server configuration error"
 - Las variables de entorno no están configuradas en Vercel
 - Ve a Settings → Environment Variables y añade `IGDB_CLIENT_ID` y `IGDB_ACCESS_TOKEN`
-
-### "CORS not allowed"
-- Tu dominio no está en `CORS_ALLOWED_ORIGINS`
-- Actualiza la variable con tu dominio de Vercel
 
 ### "Query too long"
 - El búsqueda tiene más de 100 caracteres
