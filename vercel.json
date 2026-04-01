@@ -4,7 +4,7 @@
   "installCommand": "npm install",
   "outputDirectory": "public",
   "functions": {
-    "api/**/*.js": {
+    "api/**/*.ts": {
       "memory": 128,
       "maxDuration": 10
     }
