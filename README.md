@@ -13,9 +13,9 @@ Una aplicación web segura para gestionar y valorar tu colección de juegos. Com
 ## 🔒 Seguridad
 
 ✅ **API Keys Protegidas**: Las credenciales IGDB están guardadas en el servidor, no en el cliente
-✅ **Proxy Seguro**: Todas las peticiones pasan por una Vercel Function que valida y limpia datos
+✅ **Proxy Público Seguro**: Cualquiera puede usar el proxy, pero las API keys están encriptadas en Vercel
 ✅ **Validación Form**: Input sanitizado para prevenir inyecciones
-✅ **CORS Configurado**: Solo tu dominio puede acceder al proxy
+✅ **CORS Abierto**: El proxy es público (pero seguro porque los secretos están en el servidor)
 ✅ **Headers de Seguridad**: Protección contra ataques comunes (XSS, clickjacking, etc.)
 
 ## 📋 Prerrequisitos
