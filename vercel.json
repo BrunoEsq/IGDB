@@ -2,7 +2,7 @@
   "buildCommand": "echo 'Build complete'",
   "devCommand": "node server.js",
   "installCommand": "npm install",
-  "public": ".",
+  "public": true,
   "functions": {
     "api/**/*.ts": {
       "memory": 128,
