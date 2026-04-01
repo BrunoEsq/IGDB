@@ -3,16 +3,6 @@
   "devCommand": "npx vercel dev",
   "installCommand": "npm install",
   "framework": "vanilla",
-  "env": {
-    "IGDB_CLIENT_ID": {
-      "description": "Client ID from IGDB API",
-      "required": true
-    },
-    "IGDB_ACCESS_TOKEN": {
-      "description": "Access Token from IGDB API",
-      "required": true
-    }
-  },
   "functions": {
     "api/**/*.js": {
       "memory": 128,
