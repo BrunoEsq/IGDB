@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Content-Type', 'application/json');
 
   // Manejar peticiones OPTIONS (preflight CORS)
   if (req.method === 'OPTIONS') {
@@ -47,7 +48,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('https://api.igdb.com/v4/games', {
+    const igdbResponse = await fetch('https://api.igdb.com/v4/games', {
       method: 'POST',
       headers: {
         'Client-ID': CLIENT_ID,
@@ -59,15 +60,27 @@ export default async function handler(req, res) {
       body: `fields name, id, cover.url; search "${query}"; limit 10;`
     });
 
-    if (!response.ok) {
-      console.error('IGDB API error:', response.status, response.statusText);
-      return res.status(response.status).json({ 
-        error: 'IGDB API error',
-        details: response.statusText 
+    if (!igdbResponse.ok) {
+      console.error('IGDB API error:', igdbResponse.status, igdbResponse.statusText);
+      return res.status(503).json({ 
+        error: 'IGDB service unavailable',
+        details: igdbResponse.statusText 
       });
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await igdbResponse.json();
+    } catch (e) {
+      console.error('IGDB JSON Parse Error:', e);
+      return res.status(502).json({ error: 'Invalid response from IGDB' });
+    }
+
+    // Asegurar que es un array
+    if (!Array.isArray(data)) {
+      console.error('IGDB returned non-array data:', typeof data);
+      data = [];
+    }
 
     // Procesar resultados para que sean seguros
     const safeData = data.map(game => ({
@@ -79,7 +92,6 @@ export default async function handler(req, res) {
     }));
 
     // Configurar headers de seguridad
-    res.setHeader('Content-Type', 'application/json');
     res.setHeader('Cache-Control', 'public, max-age=300'); // Cache de 5 minutos
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');

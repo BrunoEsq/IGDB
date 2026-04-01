@@ -238,13 +238,28 @@
                     body: JSON.stringify({ query })
                 });
 
+                loading.classList.add('hidden');
+
+                // Primero obtener el texto de la respuesta
+                const responseText = await response.text();
+                
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Search failed');
+                    console.error('API Error:', response.status, responseText);
+                    throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
 
-                const data = await response.json();
-                loading.classList.add('hidden');
+                // Luego parsear como JSON
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('JSON Parse Error:', responseText);
+                    throw new Error('Respuesta del servidor inválida');
+                }
+
+                if (!Array.isArray(data)) {
+                    throw new Error('Formato de respuesta inesperado');
+                }
 
                 if (data.length === 0) {
                     resultsContainer.innerHTML = '<p class="text-gray-400 text-center py-4">No se encontraron juegos.</p>';
@@ -275,7 +290,7 @@
             } catch (error) {
                 loading.classList.add('hidden');
                 console.error("Error en búsqueda:", error);
-                resultsContainer.innerHTML = `<p class="text-red-400 py-4">Error: ${error.message}</p>`;
+                resultsContainer.innerHTML = `<p class="text-red-400 py-4">⚠️ Error: ${error.message}</p>`;
             }
         }
 
