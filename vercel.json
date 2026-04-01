@@ -2,7 +2,6 @@
   "buildCommand": "echo 'Build complete'",
   "devCommand": "npx vercel dev",
   "installCommand": "npm install",
-  "framework": "vanilla",
   "functions": {
     "api/**/*.js": {
       "memory": 128,
