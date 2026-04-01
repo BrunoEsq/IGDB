@@ -1,8 +1,8 @@
 {
   "buildCommand": "echo 'Build complete'",
-  "devCommand": "npx vercel dev",
+  "devCommand": "node server.js",
   "installCommand": "npm install",
-  "outputDirectory": "public",
+  "public": ".",
   "functions": {
     "api/**/*.ts": {
       "memory": 128,
@@ -26,6 +26,12 @@
           "value": "public, max-age=300"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
     }
   ]
 }
