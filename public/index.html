@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Colección de Juegos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para la barra de navegación y animaciones */
+        .glass-nav {
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen pb-10">
+
+    <nav class="glass-nav fixed w-full z-50 top-0 border-b border-gray-800">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <span class="font-bold text-xl text-blue-500 tracking-wider"><i
+                        class="fas fa-gamepad mr-2"></i>GameTracker</span>
+                <div class="flex space-x-4">
+                    <button onclick="showSection('home')"
+                        class="hover:text-blue-400 font-medium transition px-3 py-2 rounded">Inicio</button>
+                    <button onclick="showSection('catalog')"
+                        class="hover:text-blue-400 font-medium transition px-3 py-2 rounded">Catálogo</button>
+                    <button onclick="showSection('add')"
+                        class="bg-blue-600 hover:bg-blue-500 text-white font-medium transition px-4 py-2 rounded-lg shadow-lg">Añadir
+                        Juego</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 mt-24">
+
+        <section id="home" class="section-content active">
+            <h1
+                class="text-4xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                Mi Top 3 Histórico</h1>
+            <p class="text-gray-400 mb-8">Los mejores juegos que he completado hasta ahora.</p>
+            <div id="top-games-container" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            </div>
+        </section>
+
+        <section id="catalog" class="section-content">
+            <h1 class="text-3xl font-bold mb-8 border-l-4 border-blue-500 pl-4">Todos mis juegos completados</h1>
+            <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+        </section>
+
+        <section id="add" class="section-content max-w-2xl mx-auto">
+            <h1 class="text-3xl font-bold mb-6 text-center">Registrar nuevo juego</h1>
+
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <div class="flex gap-2 mb-6">
+                    <input type="text" id="search-input" placeholder="Ej. The Witcher 3, Hollow Knight..."
+                        class="w-full bg-gray-900 border border-gray-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 transition">
+                    <button onclick="searchGame()"
+                        class="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-lg font-bold transition flex items-center">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+
+                <div id="loading" class="hidden text-center text-blue-400 my-4">
+                    <i class="fas fa-spinner fa-spin text-2xl"></i> Buscando en la base de datos...
+                </div>
+
+                <div id="search-results" class="grid grid-cols-1 gap-4 max-h-96 overflow-y-auto mb-6 pr-2">
+                </div>
+
+                <div id="rating-form" class="hidden bg-gray-900 p-4 rounded-lg border border-blue-500/30">
+                    <h3 class="text-xl font-bold mb-2 flex items-center gap-4" id="selected-game-name">
+                    </h3>
+                    <div class="flex items-end gap-4 mt-4">
+                        <div class="flex-1">
+                            <label class="block text-sm text-gray-400 mb-1">Mi Nota (0 a 10):</label>
+                            <input type="number" id="game-rating" min="0" max="10" step="0.1" placeholder="9.5"
+                                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-500 font-bold text-yellow-400 text-lg">
+                        </div>
+                        <button onclick="saveGame()"
+                            class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg transition h-[46px]">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- CONFIGURACIÓN SEGURA ---
+        // Las API keys están protegidas en el servidor (Vercel Functions)
+        // No se exponen datos sensibles en el cliente
+        
+        // --- ESTADO DE LA APLICACIÓN ---
+        let myGames = JSON.parse(localStorage.getItem('mySavedGames')) || [];
+        let selectedGameToSave = null;
+
+        // --- NAVEGACIÓN ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            if (sectionId === 'home') renderHome();
+            if (sectionId === 'catalog') renderCatalog();
+        }
+
+        // --- RENDERIZADO: HOME (TOP 3) ---
+        function renderHome() {
+            const container = document.getElementById('top-games-container');
+            container.innerHTML = '';
+
+            if (myGames.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 col-span-3">Aún no has valorado ningún juego. ¡Ve a "Añadir Juego" para empezar!</p>';
+                return;
+            }
+
+            // Ordenar por nota (mayor a menor) y coger los 3 primeros
+            const topGames = [...myGames].sort((a, b) => b.rating - a.rating).slice(0, 3);
+
+            topGames.forEach((game, index) => {
+                const medals = ['text-yellow-400', 'text-gray-300', 'text-amber-600']; // Oro, Plata, Bronce
+                const medalColor = index < 3 ? medals[index] : 'text-blue-400';
+
+                container.innerHTML += `
+                    <div class="game-card bg-gray-800 rounded-xl overflow-hidden relative border border-gray-700">
+                        <div class="absolute top-3 left-3 bg-gray-900/80 backdrop-blur px-3 py-1 rounded-full font-bold text-lg ${medalColor} z-10 border border-gray-600">
+                            #${index + 1}
+                        </div>
+                        <div class="absolute top-3 right-3 bg-yellow-500 text-gray-900 font-black px-3 py-1 rounded-lg z-10 shadow-lg">
+                            ${game.rating}
+                        </div>
+                        <img src="${game.image}" alt="${game.name}" class="w-full h-64 object-cover">
+                        <div class="p-5">
+                            <h3 class="font-bold text-xl mb-1 truncate">${game.name}</h3>
+                            <p class="text-sm text-gray-400">Completado</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- RENDERIZADO: CATÁLOGO ---
+        function renderCatalog() {
+            const container = document.getElementById('catalog-container');
+            container.innerHTML = '';
+
+            if (myGames.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 col-span-full text-center py-10">Tu catálogo está vacío.</p>';
+                return;
+            }
+
+            // Mostrar todos los juegos ordenados por los añadidos más recientemente
+            [...myGames].reverse().forEach(game => {
+                container.innerHTML += `
+                    <div class="game-card bg-gray-800 rounded-lg overflow-hidden relative border border-gray-700 flex flex-col">
+                        <div class="absolute top-2 right-2 bg-yellow-500 text-gray-900 font-black px-2 py-1 text-sm rounded z-10">
+                            ${game.rating}
+                        </div>
+                        <img src="${game.image}" alt="${game.name}" class="w-full h-48 object-cover">
+                        <div class="p-4 flex-grow flex flex-col justify-between">
+                            <h3 class="font-bold text-md mb-2 line-clamp-2">${game.name}</h3>
+                            <button onclick="deleteGame('${game.id}')" class="text-red-400 hover:text-red-300 text-sm text-left mt-2 transition"><i class="fas fa-trash mr-1"></i> Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- API BÚSQUEDA SEGURA (Vercel Function Proxy) ---
+        async function searchGame() {
+            const query = document.getElementById('search-input').value;
+            if (!query) return;
+
+            const resultsContainer = document.getElementById('search-results');
+            const loading = document.getElementById('loading');
+            const ratingForm = document.getElementById('rating-form');
+
+            resultsContainer.innerHTML = '';
+            ratingForm.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            try {
+                // Llamar al proxy seguro en Vercel Functions
+                const response = await fetch('/api/searchGames', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Search failed');
+                }
+
+                const data = await response.json();
+                loading.classList.add('hidden');
+
+                if (data.length === 0) {
+                    resultsContainer.innerHTML = '<p class="text-gray-400 text-center py-4">No se encontraron juegos.</p>';
+                    return;
+                }
+
+                data.forEach(game => {
+                    // Las URLs ya vienen procesadas del servidor
+                    let imageUrl = 'https://via.placeholder.com/150?text=Sin+Portada';
+                    if (game.cover && game.cover.url) {
+                        imageUrl = 'https:' + game.cover.url.replace('t_thumb', 't_cover_big');
+                    }
+
+                    const safeName = game.name.replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+
+                    resultsContainer.innerHTML += `
+                <div onclick="selectGame('${game.id}', '${safeName}', '${imageUrl}')" 
+                     class="flex items-center gap-4 p-3 bg-gray-700/50 hover:bg-gray-700 rounded-lg cursor-pointer transition border border-transparent hover:border-blue-500">
+                    <img src="${imageUrl}" class="w-16 h-20 object-cover rounded shadow" onerror="this.src='https://via.placeholder.com/150?text=Sin+Portada'">
+                    <div>
+                        <h4 class="font-bold text-lg">${game.name}</h4>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-gray-500"></i>
+                </div>
+            `;
+                });
+            } catch (error) {
+                loading.classList.add('hidden');
+                console.error("Error en búsqueda:", error);
+                resultsContainer.innerHTML = `<p class="text-red-400 py-4">Error: ${error.message}</p>`;
+            }
+        }
+
+        // --- LÓGICA DE AÑADIR JUEGO ---
+        function selectGame(id, name, image) {
+            selectedGameToSave = { id, name, image };
+
+            const ratingForm = document.getElementById('rating-form');
+            const selectedNameDisplay = document.getElementById('selected-game-name');
+            const resultsContainer = document.getElementById('search-results');
+
+            selectedNameDisplay.innerHTML = `<img src="${image}" class="w-10 h-10 object-cover rounded-full border border-gray-600"> Valorando: ${name}`;
+            resultsContainer.innerHTML = ''; // Limpiar resultados
+            document.getElementById('search-input').value = ''; // Limpiar input
+
+            ratingForm.classList.remove('hidden');
+            document.getElementById('game-rating').focus();
+        }
+
+        function saveGame() {
+            const ratingInput = document.getElementById('game-rating');
+            const rating = parseFloat(ratingInput.value);
+
+            if (isNaN(rating) || rating < 0 || rating > 10) {
+                alert("Por favor, introduce una nota válida entre 0 y 10.");
+                return;
+            }
+
+            // Verificar si ya existe
+            const exists = myGames.find(g => g.id === selectedGameToSave.id);
+            if (exists) {
+                alert("¡Ya tienes este juego en tu catálogo!");
+                return;
+            }
+
+            // Añadir nota y guardar
+            selectedGameToSave.rating = rating;
+            myGames.push(selectedGameToSave);
+            localStorage.setItem('mySavedGames', JSON.stringify(myGames));
+
+            // Resetear formulario
+            document.getElementById('rating-form').classList.add('hidden');
+            ratingInput.value = '';
+            selectedGameToSave = null;
+
+            // Redirigir al catálogo
+            showSection('catalog');
+        }
+
+        function deleteGame(id) {
+            if (confirm('¿Seguro que quieres borrar este juego de tu lista?')) {
+                myGames = myGames.filter(game => game.id !== id);
+                localStorage.setItem('mySavedGames', JSON.stringify(myGames));
+                renderCatalog(); // Recargar la vista
+            }
+        }
+
+        // --- INICIALIZACIÓN ---
+        renderHome();
+
+    </script>
+</body>
+
+</html>
