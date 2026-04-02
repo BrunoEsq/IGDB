@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// API endpoint
+// API endpoint1
 app.post('/api/search-games', async (req, res) => {
   const { query } = req.body || {};
 

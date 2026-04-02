@@ -41,7 +41,7 @@
 			} );
 
 		}
-
+		// asd
 		load( url, onLoad, onProgress, onError ) {
 
 			const scope = this;
