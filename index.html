@@ -993,7 +993,7 @@
                 <p class="section-subtitle">Todos los juegos que he conquistado...</p>
                 <div class="decoration-line"></div>
             </div>
-            <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-20">
+            <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-20 justify-center">
             </div>
         </section>
 
@@ -1527,7 +1527,9 @@
 
             [...myGames].reverse().forEach((game, index) => {
                 const card = document.createElement('div');
-                card.className = 'game-card relative h-64 overflow-hidden';
+                card.className = 'game-card relative overflow-hidden';
+                card.style.width = '240px';
+                card.style.height = '320px';
                 card.innerHTML = `
                     <div class="rating-badge">
                         ${game.rating}★
