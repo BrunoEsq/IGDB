@@ -10,6 +10,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public'))); // Servir archivos de la carpeta public
 
 // API endpoint1
 app.post('/api/search-games', async (req, res) => {
