@@ -1,0 +1,27 @@
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env.example
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+README.md
+.gitignore
