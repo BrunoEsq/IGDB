@@ -21,6 +21,7 @@
             box-sizing: border-box;
         }
 
+        /* Cambios */
         html {
             scroll-behavior: smooth;
         }
@@ -244,20 +245,16 @@
                 radial-gradient(circle at 30% 70%, rgba(211, 180, 140, 0.1) 0%, transparent 3%),
                 radial-gradient(circle at 70% 30%, rgba(218, 165, 32, 0.09) 0%, transparent 3%),
                 /* Líneas decorativas diagonales */
-                repeating-linear-gradient(
-                    45deg,
+                repeating-linear-gradient(45deg,
                     transparent,
                     transparent 100px,
                     rgba(184, 134, 11, 0.05) 100px,
-                    rgba(184, 134, 11, 0.05) 101px
-                ),
-                repeating-linear-gradient(
-                    -45deg,
+                    rgba(184, 134, 11, 0.05) 101px),
+                repeating-linear-gradient(-45deg,
                     transparent,
                     transparent 100px,
                     rgba(211, 180, 140, 0.04) 100px,
-                    rgba(211, 180, 140, 0.04) 101px
-                ),
+                    rgba(211, 180, 140, 0.04) 101px),
                 /* Glow azul y verde original */
                 radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 80%, rgba(46, 204, 113, 0.08) 0%, transparent 50%),
@@ -1182,7 +1179,7 @@
                     e.preventDefault();
                 }
             });
-            
+
             // Crear engine
             babylonEngine = new BABYLON.Engine(canvas, true);
             console.log('Engine creado');
@@ -1475,7 +1472,7 @@
         function protectCanvas() {
             const canvas = document.getElementById('three-canvas');
             if (!canvas) return;
-            
+
             // Estilos inline para asegurar visibilidad
             canvas.style.visibility = 'visible !important';
             canvas.style.opacity = '1 !important';
@@ -1483,20 +1480,20 @@
             canvas.style.userSelect = 'none';
             canvas.style.webkitUserSelect = 'none';
             canvas.style.touchAction = 'none';
-            
+
             // Prevenir eventos que oculten el canvas
             canvas.addEventListener('dragstart', (e) => e.preventDefault());
             canvas.addEventListener('dragend', (e) => e.preventDefault());
             canvas.addEventListener('drop', (e) => e.preventDefault());
             canvas.addEventListener('dragover', (e) => e.preventDefault());
             canvas.addEventListener('selectstart', (e) => e.preventDefault());
-            
+
             // Mantener visible durante movimiento del ratón
             document.addEventListener('mousemove', () => {
                 canvas.style.visibility = 'visible';
                 canvas.style.opacity = '1';
             }, { passive: true });
-            
+
             document.addEventListener('mouseup', () => {
                 canvas.style.visibility = 'visible';
                 canvas.style.opacity = '1';
@@ -1510,7 +1507,7 @@
             initScrollAnimations();
             renderHome();
             initNavbarAnimation();
-            
+
             // Proteger el canvas después de todo
             setTimeout(() => protectCanvas(), 100);
         });
