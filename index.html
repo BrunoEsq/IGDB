@@ -1215,7 +1215,7 @@
             console.log('Cargando modelo...');
 
             // Cargar modelo glb
-            BABYLON.SceneLoader.ImportMesh('', '/public/models/', 'modelo1.glb', babylonScene, (meshes) => {
+            BABYLON.SceneLoader.ImportMesh('', '/models/', 'modelo1.glb', babylonScene, (meshes) => {
                 console.log('✓ Modelo cargado:', meshes.length, 'meshes');
 
                 if (meshes.length > 0) {
