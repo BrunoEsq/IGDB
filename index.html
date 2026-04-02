@@ -330,8 +330,8 @@
             z-index: 5;
             min-height: 500vh;
             padding: 0;
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-            color: #0d2f3d;
+            background: linear-gradient(135deg, #0d2f3d 0%, #0a4055 50%, #0d2f3d 100%);
+            color: #e8d4a2;
         }
 
         .sticky-section {
@@ -436,7 +436,7 @@
         }
 
         .section-subtitle {
-            color: #0d3a50;
+            color: #d6dde0;
             font-size: 1.1rem;
             font-style: italic;
             margin-bottom: 2rem;
@@ -445,24 +445,16 @@
         /* Tarjetas de juegos */
         .game-card {
             position: relative;
-            border: 2px solid #00d4ff;
-            border-radius: 8px;
+            border: none;
+            border-radius: 18px;
             overflow: hidden;
             background: linear-gradient(135deg, #0a4055 0%, #0d2f3d 100%);
-            transition: all 0.4s ease;
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.6),
-                inset 0 0 20px rgba(0, 212, 255, 0.05);
+            transition: all 0.3s ease;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            perspective: 1000px;
+            transform-style: preserve-3d;
         }
 
-        .game-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow:
-                0 20px 50px rgba(0, 212, 255, 0.4),
-                inset 0 0 30px rgba(46, 204, 113, 0.15),
-                0 0 40px rgba(0, 212, 255, 0.3);
-            border-color: #2ecc71;
-        }
 
         .game-card::before {
             content: '';
@@ -470,8 +462,8 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #2ecc71, transparent);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
             z-index: 10;
         }
 
@@ -479,11 +471,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: filter 0.4s ease;
-        }
-
-        .game-card:hover img {
-            filter: brightness(1.1) contrast(1.1);
+            transition: filter 0.3s ease;
         }
 
         .rating-badge {
@@ -493,11 +481,11 @@
             background: linear-gradient(135deg, #00d4ff, #2ecc71);
             color: #0d2f3d;
             font-weight: 800;
-            padding: 0.5rem 0.75rem;
-            border-radius: 4px;
+            padding: 0.6rem 0.85rem;
+            border-radius: 12px;
             font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-            border: 2px solid #00d4ff;
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.3);
+            border: none;
             font-family: 'Cinzel', serif;
             z-index: 20;
         }
@@ -515,33 +503,30 @@
             font-weight: 900;
             font-size: 1.5rem;
             z-index: 20;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             font-family: 'Cinzel', serif;
-            border: 2px solid;
+            border: none;
         }
 
         .medal-1 {
             background: linear-gradient(135deg, #00d4ff, #2ecc71);
             color: #0d2f3d;
-            border-color: #00d4ff;
         }
 
         .medal-2 {
             background: linear-gradient(135deg, #00d4ff, #1ddc74);
             color: #0d2f3d;
-            border-color: #2ecc71;
         }
 
         .medal-3 {
             background: linear-gradient(135deg, #1ddc74, #00d4ff);
             color: #0d2f3d;
-            border-color: #1ddc74;
         }
 
         .game-info {
-            padding: 1.25rem;
+            padding: 1.5rem;
             background: linear-gradient(180deg, rgba(10, 64, 85, 0.95), rgba(13, 47, 61, 0.98));
-            border-top: 1px solid rgba(0, 212, 255, 0.3);
+            border-top: none;
         }
 
         .game-title {
@@ -560,87 +545,96 @@
 
         /* Formulario de búsqueda */
         .search-box {
-            background: #f0f0f0;
-            border: 2px solid #00d4ff;
-            border-radius: 4px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 2rem 0;
+            box-shadow: none;
+            backdrop-filter: none;
         }
 
         .search-input {
-            background: #fff;
-            border: 2px solid #ccc;
-            color: #0d2f3d;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
+            background: transparent;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #e8d4a2;
+            padding: 0.9rem 1.2rem;
+            border-radius: 8px;
             font-family: 'Crimson Text', serif;
             font-size: 1rem;
             transition: all 0.3s ease;
+            backdrop-filter: none;
+            box-shadow: none;
         }
 
         .search-input::placeholder {
-            color: #999;
+            color: rgba(232, 212, 162, 0.4);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #00d4ff;
-            background: #fafafa;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            background: transparent;
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
+            transform: translateY(-1px);
         }
 
         .search-btn {
-            background: #00d4ff;
+            background: linear-gradient(135deg, #00d4ff 0%, #2ecc71 100%);
             color: #0d2f3d;
-            border: 2px solid #00d4ff;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            font-weight: 600;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            font-weight: 700;
             font-family: 'Cinzel', serif;
             transition: all 0.3s ease;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.25);
         }
 
         .search-btn:hover {
-            background: #2ecc71;
-            border-color: #2ecc71;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+            background: linear-gradient(135deg, #2ecc71 0%, #00d4ff 100%);
+            box-shadow: 0 12px 30px rgba(46, 204, 113, 0.4);
+            transform: translateY(-3px);
         }
 
         .rating-form {
-            background: #f0f0f0;
-            border: 2px solid #00d4ff;
-            border-radius: 4px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 2rem 0;
+            box-shadow: none;
+            backdrop-filter: none;
         }
 
         .rating-form-title {
             font-family: 'Cinzel', serif;
-            color: #0d2f3d;
+            color: #2ecc71;
             font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 1rem;
+            text-shadow: none;
         }
 
         .rating-input {
-            background: #fff;
-            border: 2px solid #ccc;
-            color: #0d2f3d;
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
+            background: transparent;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #e8d4a2;
+            padding: 0.9rem 1.2rem;
+            border-radius: 8px;
             font-family: 'Cinzel', serif;
             font-weight: 700;
             font-size: 1.1rem;
             transition: all 0.3s ease;
+            backdrop-filter: none;
+            box-shadow: none;
         }
 
         .rating-input:focus {
             outline: none;
+            background: transparent;
             border-color: #00d4ff;
-            background: #fafafa;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+            transform: translateY(-1px);
         }
 
         .loading {
@@ -665,85 +659,90 @@
         }
 
         .search-result {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1rem;
+            background: transparent;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 1.2rem;
             transition: all 0.3s ease;
             cursor: pointer;
             display: flex;
             gap: 1rem;
             align-items: center;
+            backdrop-filter: none;
+            box-shadow: none;
         }
 
         .search-result:hover {
-            background: #fafafa;
-            border-color: #1a1a1a;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            transform: translateX(5px);
+            background: rgba(0, 212, 255, 0.08);
+            border-color: #2ecc71;
+            box-shadow: 0 8px 20px rgba(0, 212, 255, 0.2);
+            transform: translateX(6px) translateY(-2px);
         }
 
         .search-result img {
             width: 60px;
             height: 80px;
             object-fit: cover;
-            border: 2px solid #ddd;
-            border-radius: 3px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .search-result-title {
             font-family: 'Cinzel', serif;
-            color: #1a1a1a;
+            color: #e8d4a2;
             font-weight: 600;
         }
 
         .delete-btn {
-            background: #dc3545;
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.8) 0%, rgba(200, 35, 51, 0.8) 100%);
             color: #fff;
-            border: 1px solid #dc3545;
-            padding: 0.5rem 1rem;
-            border-radius: 3px;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
             font-family: 'Cinzel', serif;
             width: 100%;
             text-align: left;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
         }
 
         .delete-btn:hover {
-            background: #c82333;
-            box-shadow: 0 0 15px rgba(220, 53, 69, 0.4);
-            transform: translateX(-3px);
+            background: linear-gradient(135deg, rgba(200, 35, 51, 0.9) 0%, rgba(180, 25, 41, 0.9) 100%);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3);
+            transform: translateY(-2px);
         }
 
         .save-btn {
-            background: #2ecc71;
+            background: linear-gradient(135deg, #2ecc71 0%, #00d4ff 100%);
             color: #0d2f3d;
-            border: 2px solid #2ecc71;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 12px;
             font-weight: 700;
             font-family: 'Cinzel', serif;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
         }
 
         .save-btn:hover {
-            background: #27ae60;
-            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #00d4ff 0%, #2ecc71 100%);
+            box-shadow: 0 12px 30px rgba(46, 204, 113, 0.4);
+            transform: translateY(-3px);
         }
 
         .error-message {
-            color: #dc3545;
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid #dc3545;
-            padding: 1rem;
-            border-radius: 4px;
+            color: #ff6b6b;
+            background: transparent;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 1.2rem;
+            border-radius: 14px;
             text-align: center;
             font-weight: 600;
+            box-shadow: none;
         }
 
         .empty-state {
@@ -754,22 +753,34 @@
             font-size: 1.1rem;
         }
 
-        /* SECCIÓN: TOP 3 JUEGOS */
-        #top-games {
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-            color: #0d2f3d;
-        }
-
         /* SECCIÓN: CATÁLOGO */
         #catalog {
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-            color: #0d2f3d;
+            background: transparent;
+            color: #e8d4a2;
+            position: relative;
+            padding: 100px 0 60px;
+            min-height: auto;
+            margin-top: 60px;
+        }
+
+        #catalog > div {
+            position: relative;
+            z-index: 1;
         }
 
         /* SECCIÓN: AÑADIR JUEGO */
         #add {
-            background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
-            color: #0d2f3d;
+            background: transparent;
+            color: #e8d4a2;
+            position: relative;
+            padding: 100px 0 60px;
+            min-height: auto;
+            margin-top: 60px;
+        }
+
+        #add > div {
+            position: relative;
+            z-index: 1;
         }
 
         /* PANTALLA DE CARGA */
@@ -886,7 +897,7 @@
 
     <!-- Navegación -->
     <nav class="zelda-nav">
-        <h1 class="zelda-logo">JLM</h1>
+        <button class="zelda-logo" id="logo-btn" onclick="showSection('home')" style="background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; font-size: inherit; color: inherit;">JLM</button>
         <button class="hamburger-btn" id="hamburger-btn">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -905,20 +916,14 @@
                 </a>
             </li>
             <li class="menu-item">
-                <a href="#" onclick="showSection('top-games'); closeMenu()">
-                    <span class="menu-number">02</span>
-                    <span>Top 3</span>
-                </a>
-            </li>
-            <li class="menu-item">
                 <a href="#" onclick="showSection('catalog'); closeMenu()">
-                    <span class="menu-number">03</span>
+                    <span class="menu-number">02</span>
                     <span>Catálogo</span>
                 </a>
             </li>
             <li class="menu-item">
                 <a href="#" onclick="showSection('add'); closeMenu()">
-                    <span class="menu-number">04</span>
+                    <span class="menu-number">03</span>
                     <span>Añadir Juego</span>
                 </a>
             </li>
@@ -978,17 +983,6 @@
                         <img src="/personaje1.png" alt="Personaje" class="scroll-image">
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN: TOP 3 JUEGOS -->
-        <section id="top-games" class="section-content max-w-7xl mx-auto px-4">
-            <div class="mt-32 mb-8">
-                <h1 class="section-title">⚔️ Mi Top 3 Histórico</h1>
-                <p class="section-subtitle">Los legendarios juegos que he completado...</p>
-                <div class="decoration-line"></div>
-            </div>
-            <div id="top-games-container" class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-20">
             </div>
         </section>
 
@@ -1488,8 +1482,25 @@
                 initScrollAnimations();
                 renderHome();
             }
-            if (sectionId === 'top-games') renderTopGames();
-            if (sectionId === 'catalog') renderCatalog();
+            if (sectionId === 'catalog') {
+                renderCatalog();
+                // Animar títulos de sección
+                gsap.from('.section-title', {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.6,
+                    ease: 'power2.out'
+                });
+            }
+            if (sectionId === 'add') {
+                // Animar títulos de sección
+                gsap.from('.section-title', {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.6,
+                    ease: 'power2.out'
+                });
+            }
 
             closeMenu();
             window.scrollTo(0, 0);
@@ -1505,40 +1516,6 @@
             // Home solo tiene el hero con animaciones
         }
 
-        function renderTopGames() {
-            const container = document.getElementById('top-games-container');
-            container.innerHTML = '';
-
-            if (myGames.length === 0) {
-                container.innerHTML = '<p class="empty-state col-span-3">Aún no has conquistado ningún juego. ¡Inicia tu aventura en "Añadir Juego"!</p>';
-                return;
-            }
-
-            const topGames = [...myGames].sort((a, b) => b.rating - a.rating).slice(0, 3);
-
-            topGames.forEach((game, index) => {
-                const medalClass = ['medal-1', 'medal-2', 'medal-3'][index];
-                const medalSymbol = ['👑', '🥈', '🥉'][index];
-
-                const card = document.createElement('div');
-                card.className = 'game-card relative h-80 overflow-hidden group';
-                card.innerHTML = `
-                    <div class="medal-badge ${medalClass}">
-                        ${medalSymbol}
-                    </div>
-                    <div class="rating-badge">
-                        ${game.rating}★
-                    </div>
-                    <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='${PLACEHOLDER_IMAGE}'">
-                    <div class="game-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-4">
-                        <h3 class="game-title">${game.name}</h3>
-                        <p class="game-status"><i class="fas fa-check-circle mr-1"></i>Completado</p>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
         function renderCatalog() {
             const container = document.getElementById('catalog-container');
             container.innerHTML = '';
@@ -1548,7 +1525,7 @@
                 return;
             }
 
-            [...myGames].reverse().forEach(game => {
+            [...myGames].reverse().forEach((game, index) => {
                 const card = document.createElement('div');
                 card.className = 'game-card relative h-64 overflow-hidden';
                 card.innerHTML = `
@@ -1567,6 +1544,48 @@
                 const deleteBtn = card.querySelector('.delete-btn');
                 deleteBtn.addEventListener('click', () => deleteGame(game.id));
                 container.appendChild(card);
+
+                // Agregar animación GSAP mejorada a la tarjeta
+                gsap.from(card, {
+                    opacity: 0,
+                    y: 40,
+                    scale: 0.85,
+                    rotationY: -15,
+                    duration: 0.7,
+                    delay: index * 0.08,
+                    ease: 'back.out(1.3)'
+                });
+
+                // Agregar efectos hover con GSAP
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        y: -15,
+                        scale: 1.05,
+                        boxShadow: '0 30px 70px rgba(0, 212, 255, 0.35)',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                    gsap.to(card.querySelector('img'), {
+                        filter: 'brightness(1.15) contrast(1.15)',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        y: 0,
+                        scale: 1,
+                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                    gsap.to(card.querySelector('img'), {
+                        filter: 'brightness(1) contrast(1)',
+                        duration: 0.3,
+                        ease: 'power2.out'
+                    });
+                });
             });
         }
 
@@ -1609,7 +1628,7 @@
                     return;
                 }
 
-                data.forEach(game => {
+                data.forEach((game, index) => {
                     let imageUrl = PLACEHOLDER_IMAGE;
                     if (game.cover && game.cover.url) {
                         imageUrl = 'https:' + game.cover.url.replace('t_thumb', 't_cover_big');
@@ -1626,6 +1645,15 @@
                     `;
                     result.addEventListener('click', () => selectGame(game.id, game.name, imageUrl));
                     resultsContainer.appendChild(result);
+
+                    // Agregar animación GSAP
+                    gsap.from(result, {
+                        opacity: 0,
+                        x: -20,
+                        duration: 0.4,
+                        delay: index * 0.08,
+                        ease: 'power2.out'
+                    });
                 });
             } catch (error) {
                 loading.classList.add('hidden');
