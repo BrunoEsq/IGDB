@@ -221,6 +221,10 @@
             overflow: hidden;
             background: linear-gradient(135deg, #0d2f3d 0%, #0a4055 50%, #0d2f3d 100%);
             z-index: 1;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
 
         .hero-container::after {
@@ -288,6 +292,9 @@
             z-index: 10;
             filter: drop-shadow(0 0 60px rgba(0, 212, 255, 0.4));
             will-change: transform;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
 
         canvas {
@@ -297,6 +304,12 @@
             position: absolute;
             top: 0;
             left: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+            pointer-events: auto;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         /* Luz ambiente alrededor del contenedor 3D */
@@ -318,19 +331,24 @@
         .scroll-text-section {
             position: relative;
             z-index: 5;
-            min-height: 400vh;
-            padding: 200px 4% 100px 4%;
+            min-height: 500vh;
+            padding: 0;
             background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
             color: #0d2f3d;
         }
 
         .sticky-section {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            width: 100%;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
         }
 
         .scroll-text-container {
@@ -342,6 +360,9 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 0 2rem;
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
         .scroll-image {
@@ -1026,158 +1047,103 @@
             }, { passive: true });
         }
 
-        // ===== ANIMACIONES DE SCROLL =====
+        // ===== ANIMACIONES DE SCROLL - SUPERPOSICIÓN CON CROSSFADE =====
         function initScrollAnimations() {
-            // Sección 1: Fade + Scale
-            gsap.from('#scroll-text-1 .scroll-image', {
-                opacity: 0,
-                scale: 0.8,
-                scrollTrigger: {
-                    trigger: '#scroll-text-1',
-                    start: 'top 70%',
-                    end: 'top 30%',
-                    scrub: 0.5,
-                    markers: false
-                },
-                ease: 'power2.out'
-            });
+            // Hacer desaparecer todas las secciones inicialmente
+            gsap.set('.sticky-section', { opacity: 0, pointerEvents: 'none' });
+            gsap.set('.scroll-image', { opacity: 0, scale: 0.95 });
+            gsap.set('.scroll-title, .scroll-subtitle', { opacity: 0, y: 30 });
 
-            gsap.from('#scroll-text-1 .scroll-title', {
-                opacity: 0,
-                y: 30,
-                scrollTrigger: {
-                    trigger: '#scroll-text-1',
-                    start: 'top 65%',
-                    end: 'top 25%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+            const sections = document.querySelectorAll('.sticky-section');
+            const scrollTextSection = document.querySelector('.scroll-text-section');
 
-            gsap.from('#scroll-text-1 .scroll-subtitle', {
-                opacity: 0,
-                y: 20,
-                scrollTrigger: {
-                    trigger: '#scroll-text-1',
-                    start: 'top 60%',
-                    end: 'top 20%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+            sections.forEach((section, index) => {
+                const startPercent = (index / sections.length) * 100;
+                const endPercent = ((index + 1) / sections.length) * 100;
 
-            // Sección 2: Slide desde la derecha
-            gsap.from('#scroll-text-2 .scroll-image', {
-                opacity: 0,
-                x: 150,
-                scrollTrigger: {
-                    trigger: '#scroll-text-2',
-                    start: 'top 70%',
-                    end: 'top 30%',
-                    scrub: 0.5,
-                    markers: false
-                },
-                ease: 'power3.out'
-            });
+                const image = section.querySelector('.scroll-image');
+                const title = section.querySelector('.scroll-title');
+                const subtitle = section.querySelector('.scroll-subtitle');
 
-            gsap.from('#scroll-text-2 .scroll-title', {
-                opacity: 0,
-                x: -40,
-                scrollTrigger: {
-                    trigger: '#scroll-text-2',
-                    start: 'top 65%',
-                    end: 'top 25%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+                // Timeline para controlar la sección completa
+                const sectionTl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: '.scroll-text-section',
+                        start: `${startPercent}% center`,
+                        end: `${endPercent}% center`,
+                        scrub: 1,
+                        markers: false
+                    }
+                });
 
-            gsap.from('#scroll-text-2 .scroll-subtitle', {
-                opacity: 0,
-                x: -40,
-                scrollTrigger: {
-                    trigger: '#scroll-text-2',
-                    start: 'top 60%',
-                    end: 'top 20%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+                // Fade in de la sección
+                sectionTl.to(section, {
+                    opacity: 1,
+                    pointerEvents: 'auto',
+                    duration: 0.3,
+                    ease: 'power2.inOut'
+                }, 0);
 
-            // Sección 3: Slide desde la izquierda
-            gsap.from('#scroll-text-3 .scroll-image', {
-                opacity: 0,
-                x: -150,
-                scrollTrigger: {
-                    trigger: '#scroll-text-3',
-                    start: 'top 70%',
-                    end: 'top 30%',
-                    scrub: 0.5,
-                    markers: false
-                },
-                ease: 'power3.out'
-            });
+                // Animación de entrada de elementos dentro
+                if (image) {
+                    sectionTl.to(image, {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.4,
+                        ease: 'back.out(1.2)'
+                    }, 0.1);
+                }
 
-            gsap.from('#scroll-text-3 .scroll-title', {
-                opacity: 0,
-                x: 40,
-                scrollTrigger: {
-                    trigger: '#scroll-text-3',
-                    start: 'top 65%',
-                    end: 'top 25%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+                if (title) {
+                    sectionTl.to(title, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: 'power2.out'
+                    }, 0.15);
+                }
 
-            gsap.from('#scroll-text-3 .scroll-subtitle', {
-                opacity: 0,
-                x: 40,
-                scrollTrigger: {
-                    trigger: '#scroll-text-3',
-                    start: 'top 60%',
-                    end: 'top 20%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+                if (subtitle) {
+                    sectionTl.to(subtitle, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: 'power2.out'
+                    }, 0.2);
+                }
 
-            // Sección 4: Scale + Fade (como entrada elegante)
-            gsap.from('#scroll-text-4 .scroll-image', {
-                opacity: 0,
-                scale: 0.9,
-                scrollTrigger: {
-                    trigger: '#scroll-text-4',
-                    start: 'top 70%',
-                    end: 'top 30%',
-                    scrub: 0.5,
-                    markers: false
-                },
-                ease: 'back.out(1.4)'
-            });
+                // Mantener visible en el medio
+                sectionTl.to(section, {
+                    opacity: 1,
+                    duration: 0.2
+                }, '50%');
 
-            gsap.from('#scroll-text-4 .scroll-title', {
-                opacity: 0,
-                y: 30,
-                scrollTrigger: {
-                    trigger: '#scroll-text-4',
-                    start: 'top 65%',
-                    end: 'top 25%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
-            });
+                // Fade out de la sección
+                sectionTl.to(section, {
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    duration: 0.3,
+                    ease: 'power2.inOut'
+                });
 
-            gsap.from('#scroll-text-4 .scroll-subtitle', {
-                opacity: 0,
-                y: 20,
-                scrollTrigger: {
-                    trigger: '#scroll-text-4',
-                    start: 'top 60%',
-                    end: 'top 20%',
-                    scrub: 0.5
-                },
-                ease: 'power2.out'
+                // Fade out de elementos
+                if (image) {
+                    sectionTl.to(image, {
+                        opacity: 0,
+                        scale: 1.05,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    }, '<0.05');
+                }
+
+                if (title) {
+                    sectionTl.to(title, {
+                        opacity: 0,
+                        y: -20,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    }, '<0.1');
+                }
             });
         }
         const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%232a1810%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23D4A574%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Cinzel%22%3ESin Portada%3C/text%3E%3C/svg%3E';
@@ -1204,6 +1170,19 @@
             console.log('Inicializando Babylon.js...');
             console.log('Canvas size:', canvas.clientWidth, 'x', canvas.clientHeight);
 
+            // Prevenir eventos de arrastrar que ocultan el canvas
+            canvas.addEventListener('dragstart', (e) => e.preventDefault());
+            canvas.addEventListener('dragend', (e) => e.preventDefault());
+            canvas.addEventListener('drop', (e) => e.preventDefault());
+            canvas.addEventListener('dragover', (e) => e.preventDefault());
+            canvas.addEventListener('mousedown', (e) => e.preventDefault());
+            canvas.addEventListener('selectstart', (e) => e.preventDefault());
+            document.addEventListener('selectstart', (e) => {
+                if (e.target === canvas || canvas.contains(e.target)) {
+                    e.preventDefault();
+                }
+            });
+            
             // Crear engine
             babylonEngine = new BABYLON.Engine(canvas, true);
             console.log('Engine creado');
@@ -1214,7 +1193,8 @@
 
             // Cámara centrada en el modelo
             const camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 0, 5));
-            camera.attachControl(canvas, false);
+            // NO usar attachControl para prevenir que Babylon capture eventos del ratón
+            // camera.attachControl(canvas, false);
             camera.inertia = 0;
             camera.angularSensibility = 0;
             camera.target = new BABYLON.Vector3(0, 0, 0);
@@ -1289,13 +1269,7 @@
         }
 
         function setupMouseTracking() {
-            document.addEventListener('mousemove', (e) => {
-                threeMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                threeMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-
-                threeTargetRotY = threeMouseX * 0.5;
-                threeTargetRotX = threeMouseY * 0.5;
-            });
+            // Desactivado para evitar que el modelo desaparezca al arrastrar el ratón
         }
 
         function showSection(sectionId) {
@@ -1497,6 +1471,38 @@
             }
         }
 
+        // Función para proteger el canvas de desaparecer
+        function protectCanvas() {
+            const canvas = document.getElementById('three-canvas');
+            if (!canvas) return;
+            
+            // Estilos inline para asegurar visibilidad
+            canvas.style.visibility = 'visible !important';
+            canvas.style.opacity = '1 !important';
+            canvas.style.pointerEvents = 'auto !important';
+            canvas.style.userSelect = 'none';
+            canvas.style.webkitUserSelect = 'none';
+            canvas.style.touchAction = 'none';
+            
+            // Prevenir eventos que oculten el canvas
+            canvas.addEventListener('dragstart', (e) => e.preventDefault());
+            canvas.addEventListener('dragend', (e) => e.preventDefault());
+            canvas.addEventListener('drop', (e) => e.preventDefault());
+            canvas.addEventListener('dragover', (e) => e.preventDefault());
+            canvas.addEventListener('selectstart', (e) => e.preventDefault());
+            
+            // Mantener visible durante movimiento del ratón
+            document.addEventListener('mousemove', () => {
+                canvas.style.visibility = 'visible';
+                canvas.style.opacity = '1';
+            }, { passive: true });
+            
+            document.addEventListener('mouseup', () => {
+                canvas.style.visibility = 'visible';
+                canvas.style.opacity = '1';
+            }, { passive: true });
+        }
+
         // Iniciar animaciones al cargar la página
         window.addEventListener('load', () => {
             console.log('Página cargada, iniciando Babylon.js...');
@@ -1504,6 +1510,9 @@
             initScrollAnimations();
             renderHome();
             initNavbarAnimation();
+            
+            // Proteger el canvas después de todo
+            setTimeout(() => protectCanvas(), 100);
         });
 
         // Refrescar ScrollTrigger cuando se redimensiona la ventana
