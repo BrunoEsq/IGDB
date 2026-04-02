@@ -7,9 +7,13 @@
     <title>JLM - GameTracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital@0;1&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital@0;1&display=swap"
+        rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -37,7 +41,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 
+            background-image:
                 repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(212, 165, 116, 0.02) 2px, rgba(212, 165, 116, 0.02) 4px),
                 repeating-linear-gradient(-45deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
             pointer-events: none;
@@ -53,17 +57,13 @@
             width: 100%;
             z-index: 50;
             top: 0;
+            left: 0;
             padding: 1.5rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.4s ease;
-        }
-
-        /* Navbar en modo scrolled (cuando scrollea) */
-        .zelda-nav.scrolled {
-            background: rgba(255, 255, 255, 0.95);
-            border-bottom-color: rgba(0, 0, 0, 0.1);
+            transition: none;
+            border-radius: 0;
         }
 
         /* Logo */
@@ -74,11 +74,8 @@
             color: #d4a574;
             letter-spacing: 1px;
             margin: 0;
-            transition: color 0.4s ease;
-        }
-
-        .zelda-nav.scrolled .zelda-logo {
-            color: #1a1a1a;
+            transition: none;
+            white-space: nowrap;
         }
 
         /* Botón hamburguesa */
@@ -88,15 +85,11 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: #d4a574;
-            transition: all 0.4s ease;
+            transition: none;
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
             padding: 0;
-        }
-
-        .zelda-nav.scrolled .hamburger-btn {
-            color: #1a1a1a;
         }
 
         .hamburger-btn:hover {
@@ -107,11 +100,7 @@
             width: 25px;
             height: 2px;
             background: #d4a574;
-            transition: all 0.4s ease;
-        }
-
-        .zelda-nav.scrolled .hamburger-line {
-            background: #1a1a1a;
+            transition: none;
         }
 
         .hamburger-btn.active .hamburger-line:nth-child(1) {
@@ -214,6 +203,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -237,14 +227,14 @@
         .hero-background-text {
             position: absolute;
             font-family: 'Cinzel', serif;
-            font-size: clamp(15vw, 20vw, 500px);
+            font-size: clamp(11.25vw, 15vw, 375px);
             font-weight: 900;
             letter-spacing: 20px;
             color: rgba(212, 165, 116, 0.05);
             white-space: nowrap;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotateZ(-15deg);
+            bottom: -3%;
+            left: 2%;
+            transform: none;
             z-index: 0;
             pointer-events: none;
             user-select: none;
@@ -253,212 +243,31 @@
         /* Contenedor del Cubo 3D Premium */
         .cube-container {
             position: relative;
-            width: 350px;
-            height: 350px;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
             perspective: 1200px;
             z-index: 10;
             filter: drop-shadow(0 0 60px rgba(212, 165, 116, 0.3));
             will-change: transform;
         }
 
-        .cube {
+        canvas {
+            display: block;
             width: 100%;
             height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            will-change: transform;
-        }
-
-        /* Caras del cubo con gradientes premium */
-        .cube-face {
             position: absolute;
-            width: 350px;
-            height: 350px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Cinzel', serif;
-            font-size: 5rem;
-            font-weight: 900;
-            color: transparent;
-            backface-visibility: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            border: 2px solid rgba(212, 165, 116, 0.5);
-            backdrop-filter: blur(10px);
-            will-change: transform;
+            top: 0;
+            left: 0;
         }
 
-        /* Gradientes modernos para cada cara */
-        .cube-face-front {
-            transform: translateZ(175px);
-            background: linear-gradient(135deg, 
-                rgba(212, 165, 116, 0.15) 0%,
-                rgba(100, 80, 60, 0.25) 50%,
-                rgba(212, 165, 116, 0.1) 100%);
-            box-shadow: 
-                inset 0 0 40px rgba(212, 165, 116, 0.2),
-                0 0 30px rgba(212, 165, 116, 0.15),
-                inset -10px -10px 30px rgba(0, 0, 0, 0.3),
-                inset 10px 10px 30px rgba(212, 165, 116, 0.1);
-        }
-
-        .cube-face-front::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 0 0 40px rgba(212, 165, 116, 0.5);
-            filter: drop-shadow(0 0 20px rgba(212, 165, 116, 0.4));
-        }
-
-        .cube-face-back {
-            transform: rotateY(180deg) translateZ(175px);
-            background: linear-gradient(135deg,
-                rgba(80, 60, 40, 0.2) 0%,
-                rgba(212, 165, 116, 0.1) 50%,
-                rgba(80, 60, 40, 0.2) 100%);
-            box-shadow:
-                inset 0 0 40px rgba(100, 80, 60, 0.15),
-                0 0 25px rgba(212, 165, 116, 0.1),
-                inset -10px -10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .cube-face-back::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.7;
-        }
-
-        .cube-face-right {
-            transform: rotateY(90deg) translateZ(175px);
-            background: linear-gradient(90deg,
-                rgba(212, 165, 116, 0.12) 0%,
-                rgba(100, 80, 60, 0.2) 50%,
-                rgba(212, 165, 116, 0.12) 100%);
-            box-shadow:
-                inset 0 0 35px rgba(212, 165, 116, 0.15),
-                inset -20px 0px 40px rgba(0, 0, 0, 0.2),
-                0 0 30px rgba(212, 165, 116, 0.12);
-        }
-
-        .cube-face-right::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(90deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.8;
-        }
-
-        .cube-face-left {
-            transform: rotateY(-90deg) translateZ(175px);
-            background: linear-gradient(90deg,
-                rgba(100, 80, 60, 0.2) 0%,
-                rgba(212, 165, 116, 0.12) 50%,
-                rgba(100, 80, 60, 0.2) 100%);
-            box-shadow:
-                inset 0 0 35px rgba(100, 80, 60, 0.15),
-                inset 20px 0px 40px rgba(0, 0, 0, 0.2),
-                0 0 25px rgba(212, 165, 116, 0.1);
-        }
-
-        .cube-face-left::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(90deg, #D4A574 0%, #F5DEB3 50%, #D4A574 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.8;
-        }
-
-        .cube-face-top {
-            transform: rotateX(90deg) translateZ(175px);
-            background: linear-gradient(180deg,
-                rgba(212, 165, 116, 0.25) 0%,
-                rgba(212, 165, 116, 0.1) 100%);
-            box-shadow:
-                inset 0 -20px 40px rgba(0, 0, 0, 0.2),
-                0 0 40px rgba(212, 165, 116, 0.2),
-                inset 0 0 30px rgba(212, 165, 116, 0.1);
-        }
-
-        .cube-face-top::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(180deg, #D4A574 0%, #F5DEB3 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .cube-face-bottom {
-            transform: rotateX(-90deg) translateZ(175px);
-            background: linear-gradient(180deg,
-                rgba(80, 60, 40, 0.15) 0%,
-                rgba(0, 0, 0, 0.1) 100%);
-            box-shadow:
-                inset 0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 35px rgba(212, 165, 116, 0.1);
-        }
-
-        .cube-face-bottom::before {
-            content: 'JLM';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(180deg, #8B7355 0%, #5C4033 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.6;
-        }
-
-        /* Luz ambiente alrededor del cubo */
+        /* Luz ambiente alrededor del contenedor 3D */
         .cube-container::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 450px;
-            height: 450px;
+            width: 500px;
+            height: 500px;
             transform: translate(-50%, -50%);
             background: radial-gradient(circle, rgba(212, 165, 116, 0.1) 0%, transparent 70%);
             pointer-events: none;
@@ -472,8 +281,8 @@
             z-index: 5;
             min-height: 400vh;
             padding: 200px 4% 100px 4%;
-            background: linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%);
-            color: #e8d4a2;
+            background: #ffffff;
+            color: #333333;
         }
 
         .sticky-section {
@@ -487,23 +296,63 @@
 
         .scroll-text-container {
             text-align: center;
-            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .scroll-image {
+            max-height: 500px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+        }
+
+        .scroll-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .scroll-text-container {
+                flex-direction: column;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .scroll-image {
+                width: 250px;
+                height: 350px;
+            }
+
+            .scroll-title {
+                font-size: 2.5rem;
+            }
+
+            .scroll-subtitle {
+                font-size: 1.1rem;
+            }
         }
 
         .scroll-title {
             font-family: 'Cinzel', serif;
             font-size: 3.5rem;
             font-weight: 900;
-            color: #d4a574;
+            color: #1a1a1a;
             line-height: 1.2;
-            max-width: 800px;
+            max-width: 600px;
             letter-spacing: 2px;
+            margin-bottom: 1rem;
         }
 
         .scroll-subtitle {
             font-size: 1.3rem;
-            color: #666;
-            margin-top: 1.5rem;
+            color: #666666;
             font-style: italic;
             max-width: 600px;
         }
@@ -544,14 +393,14 @@
             overflow: hidden;
             background: linear-gradient(135deg, #2a1810 0%, #1a0f08 100%);
             transition: all 0.4s ease;
-            box-shadow: 
+            box-shadow:
                 0 8px 32px rgba(0, 0, 0, 0.6),
                 inset 0 0 20px rgba(212, 165, 116, 0.05);
         }
 
         .game-card:hover {
             transform: translateY(-8px) scale(1.02);
-            box-shadow: 
+            box-shadow:
                 0 20px 50px rgba(212, 165, 116, 0.4),
                 inset 0 0 30px rgba(212, 165, 116, 0.1),
                 0 0 40px rgba(212, 165, 116, 0.3);
@@ -749,8 +598,13 @@
         }
 
         @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .search-result {
@@ -912,16 +766,9 @@
         <section id="home" class="section-content active">
             <div class="hero-container">
                 <div class="hero-background-text">JLM.</div>
-                
+
                 <div class="cube-container">
-                    <div class="cube" id="rotating-cube">
-                        <div class="cube-face cube-face-front">JLM</div>
-                        <div class="cube-face cube-face-back">JLM</div>
-                        <div class="cube-face cube-face-right">JLM</div>
-                        <div class="cube-face cube-face-left">JLM</div>
-                        <div class="cube-face cube-face-top">JLM</div>
-                        <div class="cube-face cube-face-bottom">JLM</div>
-                    </div>
+                    <canvas id="three-canvas"></canvas>
                 </div>
             </div>
 
@@ -929,29 +776,41 @@
             <div class="scroll-text-section">
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-1">
-                        <h2 class="scroll-title">Mi Legado de Juegos</h2>
-                        <p class="scroll-subtitle">Cada título es una aventura completada</p>
+                        <img src="/personaje1.png" alt="Personaje 1" class="scroll-image">
+                        <div class="scroll-content">
+                            <h2 class="scroll-title">Mi Legado de Juegos</h2>
+                            <p class="scroll-subtitle">Cada título es una aventura completada</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-2">
-                        <h2 class="scroll-title">Los Mejores Mundos</h2>
-                        <p class="scroll-subtitle">Explorando historias épicas</p>
+                        <div class="scroll-content">
+                            <h2 class="scroll-title">Los Mejores Mundos</h2>
+                            <p class="scroll-subtitle">Explorando historias épicas</p>
+                        </div>
+                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
                     </div>
                 </div>
 
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-3">
-                        <h2 class="scroll-title">Descubre Mi Catálogo</h2>
-                        <p class="scroll-subtitle">Todos mis juegos en un solo lugar</p>
+                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
+                        <div class="scroll-content">
+                            <h2 class="scroll-title">Descubre Mi Catálogo</h2>
+                            <p class="scroll-subtitle">Todos mis juegos en un solo lugar</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-4">
-                        <h2 class="scroll-title">¿Listo para Explorar?</h2>
-                        <p class="scroll-subtitle">Navega hacia tus próximas aventuras</p>
+                        <div class="scroll-content">
+                            <h2 class="scroll-title">¿Listo para Explorar?</h2>
+                            <p class="scroll-subtitle">Navega hacia tus próximas aventuras</p>
+                        </div>
+                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
                     </div>
                 </div>
             </div>
@@ -989,8 +848,7 @@
 
             <div class="search-box mb-6">
                 <div class="flex gap-2 mb-4">
-                    <input type="text" id="search-input" 
-                        placeholder="Ej. The Witcher 3, Hollow Knight, Zelda..."
+                    <input type="text" id="search-input" placeholder="Ej. The Witcher 3, Hollow Knight, Zelda..."
                         class="flex-1 search-input">
                     <button onclick="searchGame()" class="search-btn">
                         <i class="fas fa-search"></i>
@@ -1078,24 +936,52 @@
         // ===== ANIMACIÓN DINÁMICA DEL NAVBAR CON SCROLL =====
         function initNavbarAnimation() {
             const navbar = document.querySelector('.zelda-nav');
-            let isScrolled = false;
+            let isIsland = false;
+            let navbarTween = null;
 
             window.addEventListener('scroll', () => {
-                if (window.scrollY > 0 && !isScrolled) {
-                    // Cambiar a blanco
-                    isScrolled = true;
-                    gsap.to(navbar, {
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        duration: 0.4,
-                        ease: 'power2.inOut'
+                const currentScroll = window.scrollY;
+
+                if (currentScroll > 50 && !isIsland) {
+                    // Convertir a isla dinámica
+                    isIsland = true;
+
+                    // Matar tween anterior si existe
+                    if (navbarTween) navbarTween.kill();
+
+                    navbarTween = gsap.to(navbar, {
+                        width: '50%',
+                        left: '25%',
+                        top: '1.5rem',
+                        borderRadius: '20px',
+                        padding: '0.875rem 1.75rem',
+                        border: '1px solid rgba(212, 165, 116, 0.35)',
+                        background: 'rgba(15, 14, 10, 0.92)',
+                        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+                        duration: 0.7,
+                        ease: 'back.out(1.5)',
+                        overwrite: 'auto'
                     });
-                } else if (window.scrollY === 0 && isScrolled) {
-                    // Volver al color original
-                    isScrolled = false;
-                    gsap.to(navbar, {
+
+                } else if (currentScroll <= 50 && isIsland) {
+                    // Volver a navbar normal
+                    isIsland = false;
+
+                    // Matar tween anterior si existe
+                    if (navbarTween) navbarTween.kill();
+
+                    navbarTween = gsap.to(navbar, {
+                        width: '100%',
+                        left: '0',
+                        top: '0',
+                        borderRadius: '0px',
+                        padding: '1.5rem 2rem',
+                        border: '1px solid rgba(212, 165, 116, 0.2)',
                         background: 'linear-gradient(135deg, #0f0e0a 0%, #1a1410 50%, #0f0e0a 100%)',
-                        duration: 0.4,
-                        ease: 'power2.inOut'
+                        boxShadow: 'none',
+                        duration: 0.7,
+                        ease: 'back.out(1.1)',
+                        overwrite: 'auto'
                     });
                 }
             }, { passive: true });
@@ -1103,34 +989,156 @@
 
         // ===== ANIMACIONES DE SCROLL =====
         function initScrollAnimations() {
-            const texts = ['#scroll-text-1', '#scroll-text-2', '#scroll-text-3', '#scroll-text-4'];
-            
-            texts.forEach((selector) => {
-                gsap.to(selector, {
-                    scrollTrigger: {
-                        trigger: selector,
-                        start: 'top 80%',
-                        end: 'bottom 20%',
-                        scrub: 1,
-                        markers: false
-                    },
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                    ease: 'power2.out'
-                });
+            // Sección 1: Fade + Scale
+            gsap.from('#scroll-text-1 .scroll-image', {
+                opacity: 0,
+                scale: 0.8,
+                scrollTrigger: {
+                    trigger: '#scroll-text-1',
+                    start: 'top 70%',
+                    end: 'top 30%',
+                    scrub: 0.5,
+                    markers: false
+                },
+                ease: 'power2.out'
+            });
 
-                // Animar el texto más arriba con parallax sutil
-                gsap.to(selector + ' .scroll-title', {
-                    scrollTrigger: {
-                        trigger: selector,
-                        start: 'top 80%',
-                        end: 'top 20%',
-                        scrub: 0.5
-                    },
-                    y: -50,
-                    ease: 'none'
-                });
+            gsap.from('#scroll-text-1 .scroll-title', {
+                opacity: 0,
+                y: 30,
+                scrollTrigger: {
+                    trigger: '#scroll-text-1',
+                    start: 'top 65%',
+                    end: 'top 25%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            gsap.from('#scroll-text-1 .scroll-subtitle', {
+                opacity: 0,
+                y: 20,
+                scrollTrigger: {
+                    trigger: '#scroll-text-1',
+                    start: 'top 60%',
+                    end: 'top 20%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            // Sección 2: Slide desde la derecha
+            gsap.from('#scroll-text-2 .scroll-image', {
+                opacity: 0,
+                x: 150,
+                scrollTrigger: {
+                    trigger: '#scroll-text-2',
+                    start: 'top 70%',
+                    end: 'top 30%',
+                    scrub: 0.5,
+                    markers: false
+                },
+                ease: 'power3.out'
+            });
+
+            gsap.from('#scroll-text-2 .scroll-title', {
+                opacity: 0,
+                x: -40,
+                scrollTrigger: {
+                    trigger: '#scroll-text-2',
+                    start: 'top 65%',
+                    end: 'top 25%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            gsap.from('#scroll-text-2 .scroll-subtitle', {
+                opacity: 0,
+                x: -40,
+                scrollTrigger: {
+                    trigger: '#scroll-text-2',
+                    start: 'top 60%',
+                    end: 'top 20%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            // Sección 3: Slide desde la izquierda
+            gsap.from('#scroll-text-3 .scroll-image', {
+                opacity: 0,
+                x: -150,
+                scrollTrigger: {
+                    trigger: '#scroll-text-3',
+                    start: 'top 70%',
+                    end: 'top 30%',
+                    scrub: 0.5,
+                    markers: false
+                },
+                ease: 'power3.out'
+            });
+
+            gsap.from('#scroll-text-3 .scroll-title', {
+                opacity: 0,
+                x: 40,
+                scrollTrigger: {
+                    trigger: '#scroll-text-3',
+                    start: 'top 65%',
+                    end: 'top 25%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            gsap.from('#scroll-text-3 .scroll-subtitle', {
+                opacity: 0,
+                x: 40,
+                scrollTrigger: {
+                    trigger: '#scroll-text-3',
+                    start: 'top 60%',
+                    end: 'top 20%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            // Sección 4: Scale + Fade (como entrada elegante)
+            gsap.from('#scroll-text-4 .scroll-image', {
+                opacity: 0,
+                scale: 0.9,
+                scrollTrigger: {
+                    trigger: '#scroll-text-4',
+                    start: 'top 70%',
+                    end: 'top 30%',
+                    scrub: 0.5,
+                    markers: false
+                },
+                ease: 'back.out(1.4)'
+            });
+
+            gsap.from('#scroll-text-4 .scroll-title', {
+                opacity: 0,
+                y: 30,
+                scrollTrigger: {
+                    trigger: '#scroll-text-4',
+                    start: 'top 65%',
+                    end: 'top 25%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
+            });
+
+            gsap.from('#scroll-text-4 .scroll-subtitle', {
+                opacity: 0,
+                y: 20,
+                scrollTrigger: {
+                    trigger: '#scroll-text-4',
+                    start: 'top 60%',
+                    end: 'top 20%',
+                    scrub: 0.5
+                },
+                ease: 'power2.out'
             });
         }
         const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%232a1810%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23D4A574%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Cinzel%22%3ESin Portada%3C/text%3E%3C/svg%3E';
@@ -1139,91 +1147,134 @@
         let selectedGameToSave = null;
 
         // ===== ANIMACIONES GSAP =====
+        // Variables globales para Babylon.js
+        let threeMouseX = 0, threeMouseY = 0;
+        let threeTargetRotX = 0, threeTargetRotY = 0;
+        let babylonEngine = null;
+        let babylonScene = null;
+        let babylonModel = null;
+
         function initHeroAnimations() {
-            const cube = document.getElementById('rotating-cube');
-            if (!cube) return;
+            const canvas = document.getElementById('three-canvas');
 
-            // Variables de seguimiento del ratón
-            let targetRotationX = 0;
-            let targetRotationY = 0;
-            let currentRotationX = 0;
-            let currentRotationY = 0;
-            const smoothSpeed = 0.08; // Delay suave (velocidad de interpolación)
+            if (!canvas) {
+                console.error('Canvas no encontrado');
+                return;
+            }
 
-            // Animación base orgánica del cubo
-            const baseAnimation = gsap.timeline({ repeat: -1 });
-            
-            baseAnimation
-                .to(cube, {
-                    rotationX: 20,
-                    rotationY: 35,
-                    duration: 5,
-                    ease: 'sine.inOut'
-                }, 0)
-                .to(cube, {
-                    rotationX: -15,
-                    rotationY: 75,
-                    duration: 7,
-                    ease: 'sine.inOut'
-                }, 2.5)
-                .to(cube, {
-                    rotationX: 35,
-                    rotationY: -50,
-                    duration: 6,
-                    ease: 'sine.inOut'
-                }, 5)
-                .to(cube, {
-                    rotationX: 0,
-                    rotationY: 0,
-                    duration: 8,
-                    ease: 'sine.inOut'
-                }, 8);
+            console.log('Inicializando Babylon.js...');
+            console.log('Canvas size:', canvas.clientWidth, 'x', canvas.clientHeight);
 
-            // Seguimiento del ratón con delay suave (estilo Apple)
-            document.addEventListener('mousemove', (e) => {
-                const cubeRect = cube.getBoundingClientRect();
-                const centerX = cubeRect.left + cubeRect.width / 2;
-                const centerY = cubeRect.top + cubeRect.height / 2;
+            // Crear engine
+            babylonEngine = new BABYLON.Engine(canvas, true);
+            console.log('Engine creado');
 
-                // Calcular ángulos objetivo basado en la posición del ratón
-                const distX = e.clientX - centerX;
-                const distY = e.clientY - centerY;
-                
-                // Rango de rotación: ±25 grados
-                targetRotationX = (distY / (window.innerHeight / 2)) * 25;
-                targetRotationY = -(distX / (window.innerWidth / 2)) * 25;
-                targetRotationX = Math.max(-25, Math.min(25, targetRotationX));
-                targetRotationY = Math.max(-25, Math.min(25, targetRotationY));
+            // Crear scene
+            babylonScene = new BABYLON.Scene(babylonEngine);
+            babylonScene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
+
+            // Cámara centrada en el modelo
+            const camera = new BABYLON.UniversalCamera('camera', new BABYLON.Vector3(0, 0, 5));
+            camera.attachControl(canvas, false);
+            camera.inertia = 0;
+            camera.angularSensibility = 0;
+            camera.target = new BABYLON.Vector3(0, 0, 0);
+            console.log('Cámara creada en:', camera.position);
+
+            // Luces más potentes
+            const light1 = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0));
+            light1.intensity = 1.5;
+            light1.specular = new BABYLON.Color3(1, 1, 1);
+
+            const light2 = new BABYLON.PointLight('light2', new BABYLON.Vector3(10, 10, 10));
+            light2.intensity = 1.5;
+            light2.range = 1000;
+
+            const light3 = new BABYLON.PointLight('light3', new BABYLON.Vector3(-10, -10, -10));
+            light3.intensity = 0.8;
+            light3.range = 1000;
+
+            console.log('Luces creadas');
+
+            console.log('Cargando modelo...');
+
+            // Cargar modelo glb
+            BABYLON.SceneLoader.ImportMesh('', '/public/models/', 'modelo1.glb', babylonScene, (meshes) => {
+                console.log('✓ Modelo cargado:', meshes.length, 'meshes');
+
+                if (meshes.length > 0) {
+                    // Crear contenedor para todos los meshes
+                    const modelContainer = new BABYLON.TransformNode('modelContainer', babylonScene);
+
+                    // Asignar todos los meshes al contenedor
+                    meshes.forEach((mesh, i) => {
+                        mesh.parent = modelContainer;
+                        console.log('Mesh', i, ':', mesh.name);
+                    });
+
+                    babylonModel = modelContainer;
+
+                    // Escala normal y centrado
+                    babylonModel.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+                    babylonModel.position = new BABYLON.Vector3(0, -1, 0);
+                    babylonModel.rotation.x = -Math.PI / 2;
+                    babylonModel.rotation.y = Math.PI;
+                    babylonModel.rotation.z = 0;
+
+                    console.log('✓ Modelo posicionado en el centro');
+                    console.log('Container:', babylonModel);
+                }
+
+                console.log('✓ Animación lista');
+            }, (progress) => {
+                const percent = (progress.loaded / progress.total * 100) || 0;
+                console.log('Cargando...', Math.round(percent) + '%');
+            }, (scene, message, exception) => {
+                console.error('✗ Error cargando modelo:', message, exception);
             });
 
-            // Animación suave de interpolación del cubo
-            gsap.ticker.add(() => {
-                currentRotationX += (targetRotationX - currentRotationX) * smoothSpeed;
-                currentRotationY += (targetRotationY - currentRotationY) * smoothSpeed;
-                
-                // Aplicar la rotación interpolada
-                gsap.set(cube, {
-                    rotationX: currentRotationX,
-                    rotationY: currentRotationY
-                });
+            // Renderizar - FUERA del callback
+            let rotationSpeed = 0.001;
+            babylonEngine.runRenderLoop(() => {
+                if (babylonModel) {
+                    // Rotación automática sobre sí mismo (eje Z)
+                    babylonModel.rotation.z += rotationSpeed;
+                }
+                babylonScene.render();
+            });
+
+            // Responsive
+            window.addEventListener('resize', () => {
+                babylonEngine.resize();
+            });
+        }
+
+        function setupMouseTracking() {
+            document.addEventListener('mousemove', (e) => {
+                threeMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                threeMouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+
+                threeTargetRotY = threeMouseX * 0.5;
+                threeTargetRotX = threeMouseY * 0.5;
             });
         }
 
         function showSection(sectionId) {
             document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            
+
             if (sectionId === 'home') {
                 initHeroAnimations();
+                setupMouseTracking();
                 initScrollAnimations();
                 renderHome();
             }
             if (sectionId === 'top-games') renderTopGames();
             if (sectionId === 'catalog') renderCatalog();
-            
+
             closeMenu();
             window.scrollTo(0, 0);
-            
+
             // Reinicializar animaciones de scroll
             setTimeout(() => {
                 ScrollTrigger.refresh();
@@ -1293,7 +1344,7 @@
                         </button>
                     </div>
                 `;
-                
+
                 const deleteBtn = card.querySelector('.delete-btn');
                 deleteBtn.addEventListener('click', () => deleteGame(game.id));
                 container.appendChild(card);
@@ -1321,7 +1372,7 @@
 
                 loading.classList.add('hidden');
                 const responseText = await response.text();
-                
+
                 if (!response.ok) {
                     throw new Error(`Error ${response.status}: ${response.statusText}`);
                 }
@@ -1367,7 +1418,7 @@
             selectedGameToSave = { id, name, image };
             const ratingForm = document.getElementById('rating-form');
             const selectedNameDisplay = document.getElementById('selected-game-name');
-            
+
             selectedNameDisplay.innerHTML = `<img src="${image}" class="w-8 h-8 rounded-full border border-D4A574 inline-block mr-2" onerror="this.src='${PLACEHOLDER_IMAGE}'"> ${name}`;
             document.getElementById('search-results').innerHTML = '';
             document.getElementById('search-input').value = '';
@@ -1409,6 +1460,7 @@
 
         // Iniciar animaciones al cargar la página
         window.addEventListener('load', () => {
+            console.log('Página cargada, iniciando Babylon.js...');
             initHeroAnimations();
             initScrollAnimations();
             renderHome();
