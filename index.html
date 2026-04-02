@@ -771,10 +771,118 @@
             background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
             color: #0d2f3d;
         }
+
+        /* PANTALLA DE CARGA */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0d2f3d 0%, #0a4055 50%, #0d2f3d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .loading-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 212, 255, 0.03) 2px,
+                rgba(0, 212, 255, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .loading-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+
+        .terminal-text {
+            font-size: clamp(1.5rem, 5vw, 3rem);
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8),
+                         0 0 20px rgba(0, 212, 255, 0.4),
+                         inset 0 0 30px rgba(0, 212, 255, 0.1);
+            margin: 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        .terminal-text::before {
+            content: '[ ';
+            color: #2ecc71;
+            margin-right: 0.5em;
+            animation: bracket-glow 1s infinite;
+        }
+
+        .terminal-text::after {
+            content: ' ]█';
+            animation: blink 0.8s infinite;
+            margin-left: 0.1em;
+            color: #2ecc71;
+        }
+
+        @keyframes bracket-glow {
+            0%, 100% { textShadow: 0 0 5px rgba(46, 204, 113, 0.5); }
+            50% { textShadow: 0 0 10px rgba(46, 204, 113, 1); }
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .loading-bar {
+            margin-top: 1.5rem;
+            width: 150px;
+            height: 2px;
+            background: rgba(0, 212, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: loading 2s infinite;
+        }
+
+        @keyframes loading {
+            0% { width: 0; left: -100%; }
+            50% { width: 100%; }
+            100% { width: 100%; left: 100%; }
+        }
     </style>
 </head>
 
 <body class="min-h-screen pb-10">
+
+    <!-- Pantalla de Carga -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-content">
+            <h1 class="terminal-text" id="terminal-text">JLM</h1>
+            <div class="loading-bar"></div>
+        </div>
+    </div>
 
     <!-- Navegación -->
     <nav class="zelda-nav">
@@ -942,6 +1050,87 @@
     <script>
         // Registrar ScrollTrigger
         gsap.registerPlugin(ScrollTrigger);
+
+        // ===== FUNCIÓN PARA RESOLVER RUTA DE MODELOS =====
+        function getModelPath() {
+            const hostname = window.location.hostname;
+            // Si estamos en localhost o 127.0.0.1, usar ruta local con /public/
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return '/public/models/';
+            }
+            // Para Vercel y producción, usar /models/
+            return '/models/';
+        }
+
+        // ===== ANIMACIÓN PANTALLA DE CARGA =====
+        function initLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const terminalText = document.getElementById('terminal-text');
+
+            if (!loadingScreen) return;
+
+            // Timeline para la animación del texto
+            const tl = gsap.timeline();
+
+            // Animar el texto con efecto de aparición letra por letra
+            tl.from(terminalText, {
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power1.out'
+            })
+            .to(terminalText, {
+                textShadow: '0 0 20px rgba(0, 212, 255, 1), 0 0 40px rgba(0, 212, 255, 0.8), inset 0 0 30px rgba(0, 212, 255, 0.3)',
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut'
+            }, 0);
+
+            // Función para desaparecer el loading screen
+            function hideLoadingScreen() {
+                gsap.to(loadingScreen, {
+                    opacity: 0,
+                    duration: 0.8,
+                    ease: 'power2.inOut',
+                    onComplete: () => {
+                        loadingScreen.style.display = 'none';
+                        // Iniciar otras animaciones que no dependen del modelo
+                        initNavbarAnimation();
+                        initScrollAnimations();
+                    }
+                });
+            }
+
+            // Esperar a que la página cargue completamente
+            window.addEventListener('load', () => {
+                // INICIAR INMEDIATAMENTE la carga del modelo
+                initHeroAnimations();
+
+                // Esperar a que el modelo esté cargado
+                const checkInterval = setInterval(() => {
+                    if (modelLoaded) {
+                        clearInterval(checkInterval);
+                        setTimeout(() => {
+                            hideLoadingScreen();
+                        }, 500);
+                    }
+                }, 100); // Revisar cada 100ms
+
+                // Timeout de seguridad: si después de 10s no carga el modelo, desaparecer igual
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    hideLoadingScreen();
+                }, 10000);
+            });
+
+            // Fallback: si la página está ya cargada (en caso de cache)
+            if (document.readyState === 'complete') {
+                window.dispatchEvent(new Event('load'));
+            }
+        }
+
+        // Iniciar loading screen
+        initLoadingScreen();
 
         // ===== FUNCIONES PARA EL MENÚ =====
         let menuOpen = false;
@@ -1155,6 +1344,7 @@
         let babylonEngine = null;
         let babylonScene = null;
         let babylonModel = null;
+        let modelLoaded = false; // Bandera para saber si el modelo está cargado
 
         function initHeroAnimations() {
             const canvas = document.getElementById('three-canvas');
@@ -1215,7 +1405,9 @@
             console.log('Cargando modelo...');
 
             // Cargar modelo glb
-            BABYLON.SceneLoader.ImportMesh('', '/models/', 'modelo1.glb', babylonScene, (meshes) => {
+            const modelPath = getModelPath();
+            console.log('Ruta del modelo:', modelPath);
+            BABYLON.SceneLoader.ImportMesh('', modelPath, 'modelo1.glb', babylonScene, (meshes) => {
                 console.log('✓ Modelo cargado:', meshes.length, 'meshes');
 
                 if (meshes.length > 0) {
@@ -1239,6 +1431,7 @@
 
                     console.log('✓ Modelo posicionado en el centro');
                     console.log('Container:', babylonModel);
+                    modelLoaded = true; // Marcar modelo como cargado
                 }
 
                 console.log('✓ Animación lista');
@@ -1502,12 +1695,10 @@
 
         // Iniciar animaciones al cargar la página
         window.addEventListener('load', () => {
-            console.log('Página cargada, iniciando Babylon.js...');
-            initHeroAnimations();
-            initScrollAnimations();
+            console.log('Página cargada');
+            // Las animaciones se inician desde initLoadingScreen() después de mostrar la pantalla de carga
             renderHome();
-            initNavbarAnimation();
-
+            
             // Proteger el canvas después de todo
             setTimeout(() => protectCanvas(), 100);
         });
