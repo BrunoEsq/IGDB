@@ -946,7 +946,7 @@
             <div class="scroll-text-section">
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-1">
-                        <img src="/personaje1.png" alt="Personaje 1" class="scroll-image">
+                        <img src="/public/personaje1.png" alt="Personaje 1" class="scroll-image">
                         <div class="scroll-content">
                             <h2 class="scroll-title">Mi Legado de Juegos</h2>
                             <p class="scroll-subtitle">Cada título es una aventura completada</p>
@@ -960,13 +960,13 @@
                             <h2 class="scroll-title">Los Mejores Mundos</h2>
                             <p class="scroll-subtitle">Explorando historias épicas</p>
                         </div>
-                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
+                        <img src="/public/personaje2.png" alt="Personaje" class="scroll-image">
                     </div>
                 </div>
 
                 <div class="sticky-section">
                     <div class="scroll-text-container" id="scroll-text-3">
-                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
+                        <img src="/public/personaje3.png" alt="Personaje" class="scroll-image">
                         <div class="scroll-content">
                             <h2 class="scroll-title">Descubre Mi Catálogo</h2>
                             <p class="scroll-subtitle">Todos mis juegos en un solo lugar</p>
@@ -980,7 +980,7 @@
                             <h2 class="scroll-title">¿Listo para Explorar?</h2>
                             <p class="scroll-subtitle">Navega hacia tus próximas aventuras</p>
                         </div>
-                        <img src="/personaje1.png" alt="Personaje" class="scroll-image">
+                        <img src="/public/personaje4.png" alt="Personaje" class="scroll-image">
                     </div>
                 </div>
             </div>
@@ -1518,6 +1518,10 @@
 
         function renderCatalog() {
             const container = document.getElementById('catalog-container');
+            
+            // Matar todas las animaciones GSAP previas en el contenedor
+            gsap.killTweensOf(container.querySelectorAll('.game-card'));
+            
             container.innerHTML = '';
 
             if (myGames.length === 0) {
@@ -1547,6 +1551,9 @@
                 deleteBtn.addEventListener('click', () => deleteGame(game.id));
                 container.appendChild(card);
 
+                // Resetear opacidad inicial a 1 antes de animar
+                gsap.set(card, { opacity: 1 });
+
                 // Agregar animación GSAP mejorada a la tarjeta
                 gsap.from(card, {
                     opacity: 0,
@@ -1555,7 +1562,11 @@
                     rotationY: -15,
                     duration: 0.7,
                     delay: index * 0.08,
-                    ease: 'back.out(1.3)'
+                    ease: 'back.out(1.3)',
+                    onComplete: () => {
+                        // Asegurar que la opacidad queda en 1 después de la animación
+                        gsap.set(card, { opacity: 1 });
+                    }
                 });
 
                 // Agregar efectos hover con GSAP
@@ -1648,13 +1659,20 @@
                     result.addEventListener('click', () => selectGame(game.id, game.name, imageUrl));
                     resultsContainer.appendChild(result);
 
+                    // Resetear opacidad inicial antes de animar
+                    gsap.set(result, { opacity: 1 });
+
                     // Agregar animación GSAP
                     gsap.from(result, {
                         opacity: 0,
                         x: -20,
                         duration: 0.4,
                         delay: index * 0.08,
-                        ease: 'power2.out'
+                        ease: 'power2.out',
+                        onComplete: () => {
+                            // Asegurar que la opacidad queda en 1 después de la animación
+                            gsap.set(result, { opacity: 1 });
+                        }
                     });
                 });
             } catch (error) {
