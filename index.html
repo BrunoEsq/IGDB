@@ -1063,11 +1063,14 @@
         }
 
         // ===== ANIMACIÓN PANTALLA DE CARGA =====
+        let loadingScreenInitialized = false; // Flag para evitar múltiples inicializaciones
+
         function initLoadingScreen() {
             const loadingScreen = document.getElementById('loading-screen');
             const terminalText = document.getElementById('terminal-text');
 
-            if (!loadingScreen) return;
+            if (!loadingScreen || loadingScreenInitialized) return;
+            loadingScreenInitialized = true;
 
             const loadStartTime = Date.now(); // Registrar cuándo empezó a cargar
             const minLoadTime = 2000; // Mínimo 2 segundos
@@ -1091,6 +1094,7 @@
 
             // Función para desaparecer el loading screen
             function hideLoadingScreen() {
+                tl.kill(); // Detener animaciones previas
                 gsap.to(loadingScreen, {
                     opacity: 0,
                     duration: 0.8,
@@ -1100,35 +1104,44 @@
                         // Iniciar otras animaciones que no dependen del modelo
                         initNavbarAnimation();
                         initScrollAnimations();
+                        renderHome(); // Agregar renderHome aquí
                     }
                 });
             }
 
-            // Esperar a que la página cargue completamente
-            window.addEventListener('load', () => {
+            // Función para iniciar el proceso
+            function startLoadingProcess() {
+                console.log('Iniciando proceso de carga...');
                 // INICIAR INMEDIATAMENTE la carga del modelo
                 initHeroAnimations();
 
                 // Esperar a que AMBAS condiciones sean true: modelo cargado Y mínimo 2 segundos
-                const checkInterval = setInterval(() => {
+                let checkInterval = setInterval(() => {
                     const elapsedTime = Date.now() - loadStartTime;
+                    console.log('Check:', { modelLoaded, elapsedTime, minMet: elapsedTime >= minLoadTime });
                     
                     if (modelLoaded && elapsedTime >= minLoadTime) {
                         clearInterval(checkInterval);
+                        console.log('Loading completado, ocultando pantalla...');
                         hideLoadingScreen();
                     }
                 }, 100); // Revisar cada 100ms
 
                 // Timeout de seguridad: si después de 10s no carga el modelo, desaparecer igual
                 setTimeout(() => {
-                    clearInterval(checkInterval);
-                    hideLoadingScreen();
+                    if (checkInterval) {
+                        clearInterval(checkInterval);
+                        console.log('Timeout alcanzado, ocultando pantalla por timeout...');
+                        hideLoadingScreen();
+                    }
                 }, 10000);
-            });
+            }
 
-            // Fallback: si la página está ya cargada (en caso de cache)
-            if (document.readyState === 'complete') {
-                window.dispatchEvent(new Event('load'));
+            // Esperar a que el DOM y recursos estén listos
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', startLoadingProcess);
+            } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
+                startLoadingProcess();
             }
         }
 
@@ -1698,12 +1711,14 @@
 
         // Iniciar animaciones al cargar la página
         window.addEventListener('load', () => {
-            console.log('Página cargada');
-            // Las animaciones se inician desde initLoadingScreen() después de mostrar la pantalla de carga
-            renderHome();
+            console.log('Página cargada - evento load final');
+            // No hacer nada aquí, todo se maneja desde initLoadingScreen()
+            // renderHome() ya se ejecuta en hideLoadingScreen()
             
             // Proteger el canvas después de todo
-            setTimeout(() => protectCanvas(), 100);
+            setTimeout(() => {
+                if (protectCanvas) protectCanvas();
+            }, 500);
         });
 
         // Refrescar ScrollTrigger cuando se redimensiona la ventana
