@@ -1069,6 +1069,9 @@
 
             if (!loadingScreen) return;
 
+            const loadStartTime = Date.now(); // Registrar cuándo empezó a cargar
+            const minLoadTime = 2000; // Mínimo 2 segundos
+
             // Timeline para la animación del texto
             const tl = gsap.timeline();
 
@@ -1106,13 +1109,13 @@
                 // INICIAR INMEDIATAMENTE la carga del modelo
                 initHeroAnimations();
 
-                // Esperar a que el modelo esté cargado
+                // Esperar a que AMBAS condiciones sean true: modelo cargado Y mínimo 2 segundos
                 const checkInterval = setInterval(() => {
-                    if (modelLoaded) {
+                    const elapsedTime = Date.now() - loadStartTime;
+                    
+                    if (modelLoaded && elapsedTime >= minLoadTime) {
                         clearInterval(checkInterval);
-                        setTimeout(() => {
-                            hideLoadingScreen();
-                        }, 500);
+                        hideLoadingScreen();
                     }
                 }, 100); // Revisar cada 100ms
 
