@@ -1262,6 +1262,8 @@
 
         // ===== ANIMACIÓN DINÁMICA DEL NAVBAR CON SCROLL =====
         function initNavbarAnimation() {
+            if (navbarAnimationInitialized) return;
+
             const navbar = document.querySelector('.zelda-nav');
             let isIsland = false;
             let navbarTween = null;
@@ -1312,10 +1314,14 @@
                     });
                 }
             }, { passive: true });
+
+            navbarAnimationInitialized = true;
         }
 
         // ===== ANIMACIONES DE SCROLL - SUPERPOSICIÓN CON CROSSFADE =====
         function initScrollAnimations() {
+            if (scrollAnimationsInitialized) return;
+
             // Hacer desaparecer todas las secciones inicialmente
             gsap.set('.sticky-section', { opacity: 0, pointerEvents: 'none' });
             gsap.set('.scroll-image', { opacity: 0, scale: 0.95 });
@@ -1412,6 +1418,8 @@
                     }, '<0.1');
                 }
             });
+
+            scrollAnimationsInitialized = true;
         }
         const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%232a1810%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23D4A574%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Cinzel%22%3ESin Portada%3C/text%3E%3C/svg%3E';
 
@@ -1433,12 +1441,21 @@
         let babylonScene = null;
         let babylonModel = null;
         let modelLoaded = false; // Bandera para saber si el modelo está cargado
+        let currentSection = 'home';
+        let heroInitialized = false;
+        let scrollAnimationsInitialized = false;
+        let navbarAnimationInitialized = false;
+        let canvasProtectionInitialized = false;
 
         function initHeroAnimations() {
             const canvas = document.getElementById('three-canvas');
 
             if (!canvas) {
                 console.error('Canvas no encontrado');
+                return;
+            }
+
+            if (heroInitialized && babylonEngine && babylonScene) {
                 return;
             }
 
@@ -1459,7 +1476,12 @@
             });
 
             // Crear engine
-            babylonEngine = new BABYLON.Engine(canvas, true);
+            babylonEngine = new BABYLON.Engine(canvas, true, {
+                preserveDrawingBuffer: false,
+                stencil: true,
+                powerPreference: 'high-performance'
+            });
+            babylonEngine.setHardwareScalingLevel(Math.min(window.devicePixelRatio || 1, 1.5));
             console.log('Engine creado');
 
             // Crear scene
@@ -1531,8 +1553,12 @@
             });
 
             // Renderizar - FUERA del callback
-            let rotationSpeed = 0.001;
+            let rotationSpeed = 0.010;
             babylonEngine.runRenderLoop(() => {
+                if (document.hidden || currentSection !== 'home') {
+                    return;
+                }
+
                 if (babylonModel) {
                     // Rotación automática sobre sí mismo (eje Z)
                     babylonModel.rotation.z += rotationSpeed;
@@ -1542,8 +1568,10 @@
 
             // Responsive
             window.addEventListener('resize', () => {
+                babylonEngine.setHardwareScalingLevel(Math.min(window.devicePixelRatio || 1, 1.5));
                 babylonEngine.resize();
             });
+            heroInitialized = true;
         }
 
         function setupMouseTracking() {
@@ -1551,6 +1579,7 @@
         }
 
         function showSection(sectionId) {
+            currentSection = sectionId;
             document.querySelectorAll('.section-content').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
 
@@ -1876,7 +1905,7 @@
         // Función para proteger el canvas de desaparecer
         function protectCanvas() {
             const canvas = document.getElementById('three-canvas');
-            if (!canvas) return;
+            if (!canvas || canvasProtectionInitialized) return;
 
             // Estilos inline para asegurar visibilidad
             canvas.style.visibility = 'visible !important';
@@ -1903,6 +1932,8 @@
                 canvas.style.visibility = 'visible';
                 canvas.style.opacity = '1';
             }, { passive: true });
+
+            canvasProtectionInitialized = true;
         }
 
         // Iniciar animaciones al cargar la página
