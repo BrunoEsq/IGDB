@@ -45,7 +45,7 @@ app.post('/api/search-games', async (req, res) => {
         'Accept': 'application/json',
         'Content-Type': 'text/plain',
       },
-      body: `fields name, id, cover.url; search "${query}"; limit 10;`,
+      body: `fields name, id, cover.url, genres.name; search "${query}"; limit 10;`,
     });
 
     if (!igdbResponse.ok) {
@@ -62,6 +62,11 @@ app.post('/api/search-games', async (req, res) => {
     const sanitized = data.map((game) => ({
       id: String(game.id || ''),
       name: String(game.name || '').substring(0, 100),
+      genres: Array.isArray(game.genres)
+        ? game.genres.map((genre) => ({
+            name: String(genre?.name || '').substring(0, 50),
+          })).filter((genre) => genre.name)
+        : [],
       cover: game.cover?.url ? {
         url: String(game.cover.url).replace(/[^a-zA-Z0-9\-_.~:/?#[\]@!$&'()*+,;=]/g, ''),
       } : null,

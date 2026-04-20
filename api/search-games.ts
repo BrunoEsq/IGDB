@@ -57,7 +57,7 @@ export default async function handler(
         'Accept': 'application/json',
         'Content-Type': 'text/plain',
       },
-      body: `fields name, id, cover.url; search "${query}"; limit 10;`,
+      body: `fields name, id, cover.url, genres.name; search "${query}"; limit 10;`,
     });
 
     if (!igdbResponse.ok) {
@@ -77,6 +77,11 @@ export default async function handler(
     const sanitized = data.map((game: any) => ({
       id: String(game.id || ''),
       name: String(game.name || '').substring(0, 100),
+      genres: Array.isArray(game.genres)
+        ? game.genres.map((genre: any) => ({
+            name: String(genre?.name || '').substring(0, 50),
+          })).filter((genre: { name: string }) => genre.name)
+        : [],
       cover: game.cover?.url ? {
         url: String(game.cover.url).replace(/[^a-zA-Z0-9\-_.~:/?#[\]@!$&'()*+,;=]/g, ''),
       } : null,

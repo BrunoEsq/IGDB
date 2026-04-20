@@ -543,6 +543,19 @@
             font-style: italic;
         }
 
+        .genre-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0d2f3d;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(0, 212, 255, 0.95));
+            box-shadow: 0 6px 16px rgba(0, 212, 255, 0.2);
+        }
+
         /* Formulario de búsqueda */
         .search-box {
             background: transparent;
@@ -576,6 +589,44 @@
             border-color: #2ecc71;
             box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
             transform: translateY(-1px);
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 2rem;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        .filter-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #c9a85a;
+            font-size: 0.95rem;
+        }
+
+        .filter-select {
+            width: 100%;
+            background: rgba(10, 64, 85, 0.65);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #e8d4a2;
+            padding: 0.9rem 1.2rem;
+            border-radius: 8px;
+            font-family: 'Crimson Text', serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
         }
 
         .search-btn {
@@ -993,6 +1044,22 @@
                 <p class="section-subtitle">Todos los juegos que he conquistado...</p>
                 <div class="decoration-line"></div>
             </div>
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="sort-filter" class="filter-label">Ordenar por nota:</label>
+                    <select id="sort-filter" class="filter-select" onchange="renderCatalog()">
+                        <option value="recent">Mas recientes primero</option>
+                        <option value="rating-desc">Nota: mayor a menor</option>
+                        <option value="rating-asc">Nota: menor a mayor</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="category-filter" class="filter-label">Filtrar por categoria:</label>
+                    <select id="category-filter" class="filter-select" onchange="renderCatalog()">
+                        <option value="all">Todas las categorias</option>
+                    </select>
+                </div>
+            </div>
             <div id="catalog-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-20 justify-center">
             </div>
         </section>
@@ -1031,6 +1098,10 @@
                         <label class="block text-sm text-c9a85a mb-1" style="color: #c9a85a;">Mi Nota (0 a 10):</label>
                         <input type="number" id="game-rating" min="0" max="10" step="0.1" placeholder="9.5"
                             class="w-full rating-input">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm text-c9a85a mb-1" style="color: #c9a85a;">Categoria:</label>
+                        <input type="text" id="game-category" readonly class="w-full rating-input" placeholder="Se asignara automaticamente">
                     </div>
                     <button onclick="saveGame()" class="save-btn h-12">
                         <i class="fas fa-check mr-1"></i> Guardar
@@ -1344,7 +1415,14 @@
         }
         const PLACEHOLDER_IMAGE = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22200%22%3E%3Crect fill=%22%232a1810%22 width=%22150%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%23D4A574%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Cinzel%22%3ESin Portada%3C/text%3E%3C/svg%3E';
 
-        let myGames = JSON.parse(localStorage.getItem('mySavedGames')) || [];
+        const FALLBACK_CATEGORY = 'Sin categoria';
+        let myGames = (JSON.parse(localStorage.getItem('mySavedGames')) || []).map((game) => ({
+            ...game,
+            genres: Array.isArray(game.genres) && game.genres.length > 0
+                ? game.genres
+                : [game.category || FALLBACK_CATEGORY],
+            category: game.category || (Array.isArray(game.genres) && game.genres[0]) || FALLBACK_CATEGORY,
+        }));
         let selectedGameToSave = null;
 
         // ===== ANIMACIONES GSAP =====
@@ -1516,8 +1594,42 @@
             // Home solo tiene el hero con animaciones
         }
 
+        function getGameCategory(game) {
+            if (game.category) return game.category;
+            if (Array.isArray(game.genres) && game.genres.length > 0) return game.genres[0];
+            return FALLBACK_CATEGORY;
+        }
+
+        function updateCategoryFilterOptions() {
+            const categoryFilter = document.getElementById('category-filter');
+            if (!categoryFilter) return;
+
+            const currentValue = categoryFilter.value || 'all';
+            const categories = [...new Set(
+                myGames
+                    .flatMap((game) => Array.isArray(game.genres) && game.genres.length > 0 ? game.genres : [getGameCategory(game)])
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b, 'es'))
+            )];
+
+            categoryFilter.innerHTML = '<option value="all">Todas las categorias</option>';
+            categories.forEach((category) => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+
+            categoryFilter.value = categories.includes(currentValue) || currentValue === 'all'
+                ? currentValue
+                : 'all';
+        }
+
         function renderCatalog() {
             const container = document.getElementById('catalog-container');
+            const sortFilter = document.getElementById('sort-filter');
+            const categoryFilter = document.getElementById('category-filter');
+            updateCategoryFilterOptions();
             
             // Matar todas las animaciones GSAP previas en el contenedor
             gsap.killTweensOf(container.querySelectorAll('.game-card'));
@@ -1529,7 +1641,27 @@
                 return;
             }
 
-            [...myGames].reverse().forEach((game, index) => {
+            const selectedCategory = categoryFilter?.value || 'all';
+            const sortMode = sortFilter?.value || 'recent';
+
+            const filteredGames = myGames.filter((game) => {
+                const genres = Array.isArray(game.genres) && game.genres.length > 0 ? game.genres : [getGameCategory(game)];
+                return selectedCategory === 'all' || genres.includes(selectedCategory);
+            });
+
+            const sortedGames = [...filteredGames].sort((a, b) => {
+                if (sortMode === 'rating-desc') return (b.rating || 0) - (a.rating || 0);
+                if (sortMode === 'rating-asc') return (a.rating || 0) - (b.rating || 0);
+                return myGames.indexOf(b) - myGames.indexOf(a);
+            });
+
+            if (sortedGames.length === 0) {
+                container.innerHTML = '<p class="empty-state col-span-full">No hay juegos en esa categoria todavia.</p>';
+                return;
+            }
+
+            sortedGames.forEach((game, index) => {
+                const category = getGameCategory(game);
                 const card = document.createElement('div');
                 card.className = 'game-card relative overflow-hidden';
                 card.style.width = '240px';
@@ -1541,6 +1673,7 @@
                     <img src="${game.image}" alt="${game.name}" class="w-full h-full object-cover" onerror="this.src='${PLACEHOLDER_IMAGE}'">
                     <div class="game-info absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent">
                         <h3 class="game-title truncate">${game.name}</h3>
+                        <span class="genre-badge">${category}</span>
                         <button class="delete-btn mt-2">
                             <i class="fas fa-trash mr-1"></i> Eliminar
                         </button>
@@ -1656,7 +1789,13 @@
                         </div>
                         <i class="fas fa-arrow-right" style="color: #D4A574;"></i>
                     `;
-                    result.addEventListener('click', () => selectGame(game.id, game.name, imageUrl));
+                    const genres = Array.isArray(game.genres)
+                        ? game.genres
+                            .map((genre) => genre && genre.name ? String(genre.name).substring(0, 50) : '')
+                            .filter(Boolean)
+                        : [];
+
+                    result.addEventListener('click', () => selectGame(game.id, game.name, imageUrl, genres));
                     resultsContainer.appendChild(result);
 
                     // Resetear opacidad inicial antes de animar
@@ -1681,14 +1820,22 @@
             }
         }
 
-        function selectGame(id, name, image) {
-            selectedGameToSave = { id, name, image };
+        function selectGame(id, name, image, genres = []) {
+            selectedGameToSave = {
+                id,
+                name,
+                image,
+                genres: genres.length > 0 ? genres : [FALLBACK_CATEGORY],
+                category: genres[0] || FALLBACK_CATEGORY,
+            };
             const ratingForm = document.getElementById('rating-form');
             const selectedNameDisplay = document.getElementById('selected-game-name');
+            const categoryInput = document.getElementById('game-category');
 
             selectedNameDisplay.innerHTML = `<img src="${image}" class="w-8 h-8 rounded-full border border-D4A574 inline-block mr-2" onerror="this.src='${PLACEHOLDER_IMAGE}'"> ${name}`;
             document.getElementById('search-results').innerHTML = '';
             document.getElementById('search-input').value = '';
+            categoryInput.value = selectedGameToSave.category;
             ratingForm.classList.remove('hidden');
             document.getElementById('game-rating').focus();
         }
@@ -1713,6 +1860,7 @@
 
             document.getElementById('rating-form').classList.add('hidden');
             ratingInput.value = '';
+            document.getElementById('game-category').value = '';
             selectedGameToSave = null;
             showSection('catalog');
         }
